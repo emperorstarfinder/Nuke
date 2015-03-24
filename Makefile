@@ -5,8 +5,8 @@
 #										  #		
 ###########################################
 
-EXE_LINUX 	  = sim_lin
-EXE_WINDW 	  = sim_win
+EXE_LINUX 	  = voxsim_lin
+EXE_WINDW 	  = voxsim_win
 TEST_EXE_NAME = tests
 
 ###########################################
@@ -36,7 +36,7 @@ TEST_EXE 	= $(addprefix $(BUILD_DIR)/,$(TEST_EXE_NAME))
 # 				SOURCES					 #
 ##########################################
 
-COM_MODULES  = simulate.cpp
+COM_MODULES  = voxsim.cpp
 TST_MODULES  = test.cpp
 TGT_MODULES  = 
 

@@ -4,6 +4,9 @@
 #include <GL/glut.h>		// Header for the GLUT library
 #include <GL/gl.h>			// Header for the OpenGL32 library
 #include <GL/glut.h>		// Header for the GLu32 library
+#include <unistd.h>			// So that we can call the sleep funtion
+
+#define ESCAPE	27			// Macro for the escape key
 
 int window;				    // Number of the GLUT window
 
@@ -56,13 +59,57 @@ void drawGlScene()
 	glutSwapBuffers();
 }
 
-void display()
+// Function that will check if the escape key is pressed and then exit
+void keyPressed(unsigned char key, int x, int y)
 {
+	usleep(100);	// No funny behaviour when key presses are too fast
+
+	// If the key is the escape key, exit
+	if (key == ESCAPE) {
+		glutDestroyWindow(window);		// Destroy the GLUT window
+		exit(0);
+	}
 }
 
 int main(int argc, char **argv) 
 {
-	glutInit(&argc, argv);
-	glutDisplayFunc(display);
+	// Init GLUT state. GLUT will take any command line  
+	// args that pertain to either it or to X windows 
+	glutInit(&argc, argv);		
+
+	// Select the display mode for GLUT
+	// [RGBA, Double buffer, Alpha channel enabled, Depth buffer]
+	glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_ALPHA | GLUT_DEPTH);
+
+	// Define a 640 x 480 window
+	glutInitWindowSize(640, 480);
+
+	// Make the window co-ords be top left of screen
+	glutInitWindowPosition(0, 0);
+
+	// Open a window
+	window = glutCreateWindow("VoxSim V0.1 =D");
+
+	// OpenGL drawing function init
+	glutDisplayFunc(&drawGlScene);
+
+	// Now make the window fullscreen (prev stuff must be done first)
+	glutFullScreen();
+
+	// Redraw the gl scene regardless of the presence of gl events
+	glutIdleFunc(&drawGlScene);
+
+	// Init the function called when resizing the screen
+	glutReshapeFunc(&resizeGlScene);
+
+	// Register the keyboard checking function
+	glutKeyboardFunc(&keyPressed);
+
+	// Init GL - the window
+	initGL(640, 480);
+
+	// Start the event loop
 	glutMainLoop();
+
+	return 1;
 }
