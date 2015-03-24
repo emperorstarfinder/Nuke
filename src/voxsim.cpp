@@ -54,6 +54,27 @@ void drawGlScene()
 	// Reset the view
 	glLoadIdentity();
 
+	// Move left 1.5 units and 6.0 units into the screen 
+	glTranslatef(-1.5f, 0.0f, -6.0f);
+
+	// Draw a triangle 
+	glBegin(GL_POLYGON);				// Start drawing a polygon
+	glVertex3f( 0.0f,  1.0f, 0.0f);		// Top
+	glVertex3f( 1.0f, -1.0f, 0.0f);		// Bottom right
+	glVertex3f(-1.0f, -1.0f, 0.0f);		// Bottom left
+	glEnd();							// Finished drawing a polygon
+
+	// Move right 3 units
+	glTranslatef(3.0f, 0.0f, 0.0f);		
+
+	// Draw a square 
+	glBegin(GL_QUADS);					// Start drawing a quad
+	glVertex3f(-1.0f,  1.0f, 0.0f);		// Top left
+	glVertex3f( 1.0f,  1.0f, 0.0f);		// Top right
+	glVertex3f( 1.0f, -1.0f, 0.0f);		// Bottom right
+	glVertex3f(-1.0f, -1.0f, 0.0f);		// Bottom left
+	glEnd();							// Finished drawing the quad
+
 	// Double buffered so swap the buffers 
 	// to display what was just drawn
 	glutSwapBuffers();
