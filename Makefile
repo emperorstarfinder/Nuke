@@ -5,9 +5,9 @@
 #										  #		
 ###########################################
 
-EXE_LINUX 	  = voxsim_lin
-EXE_WINDW 	  = voxsim_win
-TEST_EXE_NAME = tests
+EXE_LINUX 	  = voxsim-lin
+EXE_WINDW 	  = voxsim-win
+TEST_EXE_NAME = voxsim-tests
 
 ###########################################
 # 			DIRECTORIES					  #
@@ -77,16 +77,16 @@ WXX			= x86_64-w64-mingw32-g++
 CXX_FLAGS 	= 
 WXX_FLAGS   =
 
-.PHONY: all lin win tests
+.PHONY: all vsim vtests
 
 # No win or tests till this works (may be a while)
-all: lin  
+all: vsim
 
-lin: $(EXE_LIN)
+vsim: $(EXE_LIN)
 
-win: $(EXE_WIN)
+win: $(EXE_WIN)				$ Not working yet
 
-tests: $(TEST_EXE)
+vtests: $(TEST_EXE)
 
 $(EXE_LIN):
 	$(CXX) $(CXX_FLAGS) $(COM_SOURCES) $(TGT_SOURCES) -o $(EXE_LIN)  \
