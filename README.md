@@ -7,11 +7,11 @@ Currently I am in the process of learning OpenGL, which is what the souce and th
 ## Building
 To build VoxSim make sure that all of the prerequisits are installed and working - see Prerequisits section. The when in the project root directoy (where the Makefile is) run:
 ```python
-$ make voxsim # To make VoxSim exe
-$ make vtests # To make VoxSim Unit tests exe
+$ make vsim   # To make VoxSim linux executable
+$ make vtests # To make VoxSim Unit tests executable
 $ make clean  # Clean both the executables
 ```
 
-Note that all executables are built to the builds directory.
+Note that all executables are built to the builds directory and are for linux.
 
 
