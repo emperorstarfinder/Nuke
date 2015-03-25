@@ -10,6 +10,9 @@
 
 int window;				    // Number of the GLUT window
 
+float thetaTri;				// Angle of rotation for the triangle
+float thetaQuad;			// Angle of rotation for the quad
+
 // General OpenGL init. Sets all initial params
 void initGL(int width, int height)
 {
@@ -56,24 +59,37 @@ void drawGlScene()
 
 	// Move left 1.5 units and 6.0 units into the screen 
 	glTranslatef(-1.5f, 0.0f, -6.0f);
+	glRotatef(thetaTri, 0.0f, 1.0f, 0.0f);		// Rotate about y axis
 
 	// Draw a triangle 
 	glBegin(GL_POLYGON);				// Start drawing a polygon
+	glColor3f(1.0f, 0.0f, 0.0f);		// Top vertex red
 	glVertex3f( 0.0f,  1.0f, 0.0f);		// Top
+	glColor3f(0.0f, 1.0f, 0.0f);		// Bottom right vertex green
 	glVertex3f( 1.0f, -1.0f, 0.0f);		// Bottom right
+	glColor3f(0.0f, 0.0f, 1.0f);		// Bottom left vertex blue
 	glVertex3f(-1.0f, -1.0f, 0.0f);		// Bottom left
 	glEnd();							// Finished drawing a polygon
 
-	// Move right 3 units
-	glTranslatef(3.0f, 0.0f, 0.0f);		
+	glLoadIdentity();						// Reset the view
+	glTranslatef(1.5f, 0.0f, -6.0f);		// Move 1.5 units right from the origin		
+	glRotatef(thetaQuad, 1.0f, 0.0f, 0.0f);	// Rotate quad about x axis
 
 	// Draw a square 
 	glBegin(GL_QUADS);					// Start drawing a quad
+	glColor3f(0.0f, 1.0f, 0.0f);		// Top left Green
 	glVertex3f(-1.0f,  1.0f, 0.0f);		// Top left
-	glVertex3f( 1.0f,  1.0f, 0.0f);		// Top right
+	glColor3f(1.0f, 0.0f, 1.0f);		// Top right magenta
+	glVertex3f( 1.0f,  1.0f, 0.0f);		// Top right 
+	glColor3f(0.0f, 1.0f, 1.0f);		// Bottom right cyan
 	glVertex3f( 1.0f, -1.0f, 0.0f);		// Bottom right
+	glColor3f(0.0f, 0.0f, 1.0f);		// Bottom left blue
 	glVertex3f(-1.0f, -1.0f, 0.0f);		// Bottom left
 	glEnd();							// Finished drawing the quad
+
+	// Update the amount of rotation
+	thetaTri  += 0.2f;
+	thetaQuad -= 0.7f;
 
 	// Double buffered so swap the buffers 
 	// to display what was just drawn
