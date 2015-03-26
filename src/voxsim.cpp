@@ -1,21 +1,141 @@
-#include <stdio.h>			
-#include <stdlib.h>
-
+#include <stdio.h>			// Allows standard io
+#include <stdlib.h>			// Needed for malloc and free
+#include <unistd.h>			// So that the sleep function can be called
 #include <GL/glut.h>		// Header for the GLUT library
 #include <GL/gl.h>			// Header for the OpenGL32 library
 #include <GL/glut.h>		// Header for the GLu32 library
-#include <unistd.h>			// So that we can call the sleep funtion
 
 #define ESCAPE	27			// Macro for the escape key
 
 int window;				    // Number of the GLUT window
 
-float thetaTri;				// Angle of rotation for the triangle
-float thetaQuad;			// Angle of rotation for the quad
+float rotCx, rotCy, rotCz, rotT;				// Angles of rotation for the cube ad triangle
+
+unsigned int texture[1];									// Storage for one texture
+
+// Define an image type 
+typedef struct Image {
+	unsigned long sizeX;
+	unsigned long sizeY;
+	char *data;
+} Image;
+
+// Simple bitmap loader
+// See http://www.dcs.ed.ac.uk/~mxr/gfx/2d/BMP.txt for more info.
+int loadImage(const char * filename, Image * image)
+{
+	FILE *file;									// File handle
+	unsigned long size;							// Image size (in bytes)
+	unsigned long i;							// Counter
+	unsigned short int planes;					// Number of planes in image (must be 1)
+	unsigned short int bpp;						// Bits per pixel (must be 24)
+	char temp;									// Temp col storage for bgr->rgb conversion
+
+	// Make sure that the file exists
+	if ((file = fopen(filename, "rb")) == NULL) {
+		printf("File Not Found : %s\n", filename);
+		return 0;
+	}
+	
+	// Seek through the BMP header
+	fseek(file, 18, SEEK_CUR);
+
+	// Read the bmp width
+	if ((i = fread(&image->sizeX, 4, 1, file)) != 1) {
+		printf("Error reading the width from : %s\n", filename);
+	}
+	printf("Got the width from %s as : %lu\n", filename, image->sizeX);
+
+	// Read the height 
+	if ((i = fread(&image->sizeY, 4, 1, file)) != 1) {
+		printf("Error reading the height from %s\n", filename);
+	}
+	printf("Got the height from %s as : %lu\n", filename, image->sizeY);
+
+	// Calculate the size (assuming 24 bits and 3 bytes per pixel
+	size = image->sizeX * image->sizeY * 3;
+
+	// Read the planes 
+	if ((fread(&planes, 2, 1, file)) != 1) {
+		printf("Error reading the planes from %s\n", filename);
+		return 0;
+	}
+	if (planes != 1) {
+		printf("Planes from %s is not 1, but rather is : %u\n", filename, planes);
+		return 0;
+	}
+
+	// Read the BPP
+	if ((i = fread(&bpp, 2, 1, file)) != 1) {
+		printf("Error reading the bpp from : %s\n", filename);
+		return 0;
+	}
+	if (bpp != 24) {
+		printf("Bpp from %s is not 24 but rather is : %u\n", filename, bpp);
+		return 0;
+	}
+
+	// Seek past the rest of the bitmap header
+	fseek(file, 24, SEEK_CUR);
+
+	// Read in the pixel data 
+	image->data = (char *)malloc(size);			// Allocate some space
+	if (image->data == NULL) {
+		printf("Error allocating the memory for the color-corrected image data");
+		return 0;
+	}
+
+	if ((i == fread(image->data, size, 1, file)) != 1) {
+		printf("Error reading the image data from %s.\n", filename);
+		return 0;
+	}
+
+	// Reverse all if the colors (bgr -> rgb)
+	for (i = 0; i < size; i+=3) {				// Each pixel
+		temp = image->data[i];					// blue as temp
+		image->data[i] = image->data[i+2];		// Blue to red
+		image->data[i+2] = temp;				// Red to blue
+	}
+
+	// Success =D
+	return 1;
+}
+
+// Load the bitmaps and Convert them to textures
+void loadGlTextures()
+{
+	Image *image1;								// Load a texture
+
+	// Allocate memory for the texture
+	image1 = (Image *)malloc(sizeof(Image));
+	if (image1 == NULL) {
+		printf("Error allocating space for the image\n");
+		exit(0);								// Quit
+	}
+	
+	const char * textureFile = "textures/Grass.bmp";			// Declare the filename
+
+	if (!loadImage(textureFile, image1)) {
+		exit(1);
+	}
+
+	glGenTextures(1, &texture[0]);				// Create the texture
+	glBindTexture(GL_TEXTURE_2D, texture[0]);	// 2D texture (x, y)
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);	// Scale linearly when img bigger than texture
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);	// Scale linearly when img smaller than texture
+
+	// Params are:
+	//	[2d tex  ,  detail level     ,  num components, img x size, img y size, border,
+	//	 col data, unsigned byte data, data itself]
+	glTexImage2D(GL_TEXTURE_2D,	0, 3, image1->sizeX, image1->sizeY, 0, GL_RGB, GL_UNSIGNED_BYTE, image1->data);
+}
 
 // General OpenGL init. Sets all initial params
 void initGL(int width, int height)
 {
+	loadGlTextures();							// Load the textures
+	glEnable(GL_TEXTURE_2D);					// Enable texture mapping
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);		// Black background
 	glClearDepth(1.0);							// Allows depth buffer to be cleared
 	glDepthFunc(GL_LESS);						// The type of depth test
@@ -55,103 +175,58 @@ void drawGlScene()
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);	
 	
 	// Reset the view
-	glLoadIdentity();
-
-	// Move left 1.5 units and 6.0 units into the screen 
-	glTranslatef(-2.5f, 0.0f, -6.0f);
-	glRotatef(thetaTri, 0.0f, 1.0f, 0.0f);		// Rotate about y axis
-
-	// Draw a triangle 
-	glBegin(GL_POLYGON);				// Start drawing a polygon
-	
-	// front face of pyramid
-    glColor3f(1.0f,0.0f,0.0f);			// Set The Color To Red
-	glVertex3f(0.0f, 1.0f, 0.0f);		        // Top of triangle (front)
-	glColor3f(0.0f,1.0f,0.0f);			// Set The Color To Green
-	glVertex3f(-1.0f,-1.0f, 1.0f);		// left of triangle (front)
-	glColor3f(0.0f,0.0f,1.0f);			// Set The Color To Blue
-	glVertex3f(1.0f,-1.0f, 1.0f);		        // right of traingle (front)	
-
-	// right face of pyramid
-	glColor3f(1.0f,0.0f,0.0f);			// Red
-	glVertex3f( 0.0f, 1.0f, 0.0f);		// Top Of Triangle (Right)
-	glColor3f(0.0f,0.0f,1.0f);			// Blue
-	glVertex3f( 1.0f,-1.0f, 1.0f);		// Left Of Triangle (Right)
-	glColor3f(0.0f,1.0f,0.0f);			// Green
-	glVertex3f( 1.0f,-1.0f, -1.0f);		// Right Of Triangle (Right)
-
-	// back face of pyramid
-	glColor3f(1.0f,0.0f,0.0f);			// Red
-	glVertex3f( 0.0f, 1.0f, 0.0f);		// Top Of Triangle (Back)
-    glColor3f(0.0f,1.0f,0.0f);			// Green
-	glVertex3f( 1.0f,-1.0f, -1.0f);		// Left Of Triangle (Back)
-	glColor3f(0.0f,0.0f,1.0f);			// Blue
-	glVertex3f(-1.0f,-1.0f, -1.0f);		// Right Of Triangle (Back)
-
-	// left face of pyramid.
-	glColor3f(1.0f,0.0f,0.0f);			// Red
-	glVertex3f( 0.0f, 1.0f, 0.0f);		// Top Of Triangle (Left)
-	glColor3f(0.0f,0.0f,1.0f);			// Blue
-	glVertex3f(-1.0f,-1.0f,-1.0f);		// Left Of Triangle (Left)
-	glColor3f(0.0f,1.0f,0.0f);			// Green
-	glVertex3f(-1.0f,-1.0f, 1.0f);		// Right Of Triangle (Left)		
-
-	glEnd();							// Finish drawing pyramid
-
 	glLoadIdentity();						// Reset the view
-	glTranslatef(2.5f, 0.0f, -7.0f);		// Move 1.5 units right from the origin		
-	glRotatef(thetaQuad, 1.0f, 2.0f, 1.0f);	// Rotate quad about x,y, and z axis
+	glTranslatef(0.f, 0.0f, -5.0f);		// Move 2.5 units right and 5 in
+	glRotatef(rotCx, 1.0f, 0.0f, 0.0f);		// Rotate quad about x
+	glRotatef(rotCy, 0.0f, 1.0f, 0.0f);		// Rotate quad about y
+	glRotatef(rotCz, 0.0f, 0.0f, 1.0f);		// Rotate quad about z
+
+	glBindTexture(GL_TEXTURE_2D, texture[0]);	// Select the texture to use
 
 	// Draw a square 
 	glBegin(GL_QUADS);					// Start drawing a quad
 
-	// top of cube
-	glColor3f(0.0f,1.0f,0.0f);			// Set The Color To Blue
-	glVertex3f( 1.0f, 1.0f,-1.0f);		// Top Right Of The Quad (Top)
-	glVertex3f(-1.0f, 1.0f,-1.0f);		// Top Left Of The Quad (Top)
-	glVertex3f(-1.0f, 1.0f, 1.0f);		// Bottom Left Of The Quad (Top)
-	glVertex3f( 1.0f, 1.0f, 1.0f);		// Bottom Right Of The Quad (Top)
-
-	// bottom of cube
-	glColor3f(1.0f,0.5f,0.0f);			// Set The Color To Orange
-	glVertex3f( 1.0f,-1.0f, 1.0f);		// Top Right Of The Quad (Bottom)
-	glVertex3f(-1.0f,-1.0f, 1.0f);		// Top Left Of The Quad (Bottom)
-	glVertex3f(-1.0f,-1.0f,-1.0f);		// Bottom Left Of The Quad (Bottom)
-	glVertex3f( 1.0f,-1.0f,-1.0f);		// Bottom Right Of The Quad (Bottom)
-
-	// front of cube
-	glColor3f(1.0f,0.0f,0.0f);			// Set The Color To Red
-	glVertex3f( 1.0f, 1.0f, 1.0f);		// Top Right Of The Quad (Front)
-	glVertex3f(-1.0f, 1.0f, 1.0f);		// Top Left Of The Quad (Front)
-	glVertex3f(-1.0f,-1.0f, 1.0f);		// Bottom Left Of The Quad (Front)
-	glVertex3f( 1.0f,-1.0f, 1.0f);		// Bottom Right Of The Quad (Front)
-
-	// back of cube.
-	glColor3f(1.0f,1.0f,0.0f);			// Set The Color To Yellow
-	glVertex3f( 1.0f,-1.0f,-1.0f);		// Top Right Of The Quad (Back)
-	glVertex3f(-1.0f,-1.0f,-1.0f);		// Top Left Of The Quad (Back)
-	glVertex3f(-1.0f, 1.0f,-1.0f);		// Bottom Left Of The Quad (Back)
-	glVertex3f( 1.0f, 1.0f,-1.0f);		// Bottom Right Of The Quad (Back)
-
-	// left of cube
-	glColor3f(0.0f,0.0f,1.0f);			// Blue
-	glVertex3f(-1.0f, 1.0f, 1.0f);		// Top Right Of The Quad (Left)
-	glVertex3f(-1.0f, 1.0f,-1.0f);		// Top Left Of The Quad (Left)
-	glVertex3f(-1.0f,-1.0f,-1.0f);		// Bottom Left Of The Quad (Left)
-	glVertex3f(-1.0f,-1.0f, 1.0f);		// Bottom Right Of The Quad (Left)
-
-	// Right of cube
-	glColor3f(1.0f,0.0f,1.0f);			// Set The Color To Violet
-	glVertex3f( 1.0f, 1.0f,-1.0f);	    // Top Right Of The Quad (Right)
-	glVertex3f( 1.0f, 1.0f, 1.0f);		// Top Left Of The Quad (Right)
-	glVertex3f( 1.0f,-1.0f, 1.0f);		// Bottom Left Of The Quad (Right)
-	glVertex3f( 1.0f,-1.0f,-1.0f);		// Bottom Right Of The Quad (Right)
+	 // Front Face (note that the texture's corners have to match the quad's corners)
+    glTexCoord2f(0.0f, 0.0f); glVertex3f(-1.0f, -1.0f,  1.0f);	// Bottom Left Of The Texture and Quad
+    glTexCoord2f(1.0f, 0.0f); glVertex3f( 1.0f, -1.0f,  1.0f);	// Bottom Right Of The Texture and Quad
+    glTexCoord2f(1.0f, 1.0f); glVertex3f( 1.0f,  1.0f,  1.0f);	// Top Right Of The Texture and Quad
+    glTexCoord2f(0.0f, 1.0f); glVertex3f(-1.0f,  1.0f,  1.0f);	// Top Left Of The Texture and Quad
+    
+    // Back Face
+    glTexCoord2f(1.0f, 0.0f); glVertex3f(-1.0f, -1.0f, -1.0f);	// Bottom Right Of The Texture and Quad
+    glTexCoord2f(1.0f, 1.0f); glVertex3f(-1.0f,  1.0f, -1.0f);	// Top Right Of The Texture and Quad
+    glTexCoord2f(0.0f, 1.0f); glVertex3f( 1.0f,  1.0f, -1.0f);	// Top Left Of The Texture and Quad
+    glTexCoord2f(0.0f, 0.0f); glVertex3f( 1.0f, -1.0f, -1.0f);	// Bottom Left Of The Texture and Quad
+	
+    // Top Face
+    glTexCoord2f(0.0f, 1.0f); glVertex3f(-1.0f,  1.0f, -1.0f);	// Top Left Of The Texture and Quad
+    glTexCoord2f(0.0f, 0.0f); glVertex3f(-1.0f,  1.0f,  1.0f);	// Bottom Left Of The Texture and Quad
+    glTexCoord2f(1.0f, 0.0f); glVertex3f( 1.0f,  1.0f,  1.0f);	// Bottom Right Of The Texture and Quad
+    glTexCoord2f(1.0f, 1.0f); glVertex3f( 1.0f,  1.0f, -1.0f);	// Top Right Of The Texture and Quad
+    
+    // Bottom Face       
+    glTexCoord2f(1.0f, 1.0f); glVertex3f(-1.0f, -1.0f, -1.0f);	// Top Right Of The Texture and Quad
+    glTexCoord2f(0.0f, 1.0f); glVertex3f( 1.0f, -1.0f, -1.0f);	// Top Left Of The Texture and Quad
+    glTexCoord2f(0.0f, 0.0f); glVertex3f( 1.0f, -1.0f,  1.0f);	// Bottom Left Of The Texture and Quad
+    glTexCoord2f(1.0f, 0.0f); glVertex3f(-1.0f, -1.0f,  1.0f);	// Bottom Right Of The Texture and Quad
+    
+    // Right face
+    glTexCoord2f(1.0f, 0.0f); glVertex3f( 1.0f, -1.0f, -1.0f);	// Bottom Right Of The Texture and Quad
+    glTexCoord2f(1.0f, 1.0f); glVertex3f( 1.0f,  1.0f, -1.0f);	// Top Right Of The Texture and Quad
+    glTexCoord2f(0.0f, 1.0f); glVertex3f( 1.0f,  1.0f,  1.0f);	// Top Left Of The Texture and Quad
+    glTexCoord2f(0.0f, 0.0f); glVertex3f( 1.0f, -1.0f,  1.0f);	// Bottom Left Of The Texture and Quad
+    
+    // Left Face
+    glTexCoord2f(0.0f, 0.0f); glVertex3f(-1.0f, -1.0f, -1.0f);	// Bottom Left Of The Texture and Quad
+    glTexCoord2f(1.0f, 0.0f); glVertex3f(-1.0f, -1.0f,  1.0f);	// Bottom Right Of The Texture and Quad
+    glTexCoord2f(1.0f, 1.0f); glVertex3f(-1.0f,  1.0f,  1.0f);	// Top Right Of The Texture and Quad
+    glTexCoord2f(0.0f, 1.0f); glVertex3f(-1.0f,  1.0f, -1.0f);	// Top Left Of The Texture and Quad
 
 	glEnd();							// Finished drawing the quad
 
-	// Update the amount of rotation
-	thetaTri  += 1.2f;
-	thetaQuad -= 1.7f;
+	rotCx += 1.5f;
+	rotCy += 1.5f;
+	rotCz += 1.5f;
 
 	// Double buffered so swap the buffers 
 	// to display what was just drawn
