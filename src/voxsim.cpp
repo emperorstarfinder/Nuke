@@ -28,6 +28,7 @@ GLfloat lightPosition[] = {0.0f, 0.0f, 2.0f, 1.0f};	// Out the screen facing fro
 
 GLuint filter;						// Which of the textures to use
 GLuint texture[3];					// Storage for 3 textures
+GLuint blend;						// Turn the blending on or off
 
 // Define an image type 
 typedef struct Image {
@@ -35,6 +36,37 @@ typedef struct Image {
 	unsigned long sizeY;
 	char *data;
 } Image;
+
+// Other bitmap loader not working
+static unsigned int getint(FILE *fp)
+{
+	int c, c1, c2, c3;
+
+	// Get 4 bytes
+	c  = getc(fp);
+	c1 = getc(fp);
+	c2 = getc(fp);
+	c3 = getc(fp);
+
+	// Return the result
+	return ((unsigned int) c ) + 
+		   (((unsigned int) c1) << 8) +
+		   (((unsigned int) c2) << 16) +
+		   (((unsigned int) c3) << 24);
+}
+
+static unsigned short getshort(FILE *fp)
+{
+	int c, c1;
+
+	// Get 2 bytes
+	c  = getc(fp);
+	c1 = getc(fp);
+
+	// Return the result
+	return ((unsigned int) c) +
+		   (((unsigned int) c1) << 8);
+}
 
 // Simple bitmap loader
 // See http://www.dcs.ed.ac.uk/~mxr/gfx/2d/BMP.txt for more info.
@@ -56,40 +88,30 @@ int loadImage(const char * filename, Image * image)
 	// Seek through the BMP header
 	fseek(file, 18, SEEK_CUR);
 
-	// Read the bmp width
-	if ((i = fread(&image->sizeX, 4, 1, file)) != 1) {
-		printf("Error reading the width from : %s\n", filename);
-	}
-	printf("Got the width from %s as : %lu\n", filename, image->sizeX);
-
-	// Read the height 
-	if ((i = fread(&image->sizeY, 4, 1, file)) != 1) {
-		printf("Error reading the height from %s\n", filename);
-	}
-	printf("Got the height from %s as : %lu\n", filename, image->sizeY);
+	// Read the width
+    image->sizeX = getint (file);
+    printf("Width of %s: %lu\n", filename, image->sizeX);
+    
+    // Read the height 
+    image->sizeY = getint (file);
+    printf("Height of %s: %lu\n", filename, image->sizeY);
 
 	// Calculate the size (assuming 24 bits and 3 bytes per pixel
 	size = image->sizeX * image->sizeY * 3;
 
-	// Read the planes 
-	if ((fread(&planes, 2, 1, file)) != 1) {
-		printf("Error reading the planes from %s\n", filename);
-		return 0;
-	}
-	if (planes != 1) {
-		printf("Planes from %s is not 1, but rather is : %u\n", filename, planes);
-		return 0;
-	}
+    // Read the planes
+    planes = getshort(file);
+    if (planes != 1) {
+	printf("Planes from %s is not 1: %u\n", filename, planes);
+	return 0;
+    }
 
-	// Read the BPP
-	if ((i = fread(&bpp, 2, 1, file)) != 1) {
-		printf("Error reading the bpp from : %s\n", filename);
-		return 0;
-	}
-	if (bpp != 24) {
-		printf("Bpp from %s is not 24 but rather is : %u\n", filename, bpp);
-		return 0;
-	}
+    // Read the bpp
+    bpp = getshort(file);
+    if (bpp != 24) {
+      printf("Bpp from %s is not 24: %u\n", filename, bpp);
+      return 0;
+    }
 
 	// Seek past the rest of the bitmap header
 	fseek(file, 24, SEEK_CUR);
@@ -101,7 +123,7 @@ int loadImage(const char * filename, Image * image)
 		return 0;
 	}
 
-	if ((i == fread(image->data, size, 1, file)) != 1) {
+	if ((i = fread(image->data, size, 1, file)) != 1) {
 		printf("Error reading the image data from %s.\n", filename);
 		return 0;
 	}
@@ -120,23 +142,23 @@ int loadImage(const char * filename, Image * image)
 // Load the bitmaps and convert them to textures
 void loadGlTextures()
 {
-	Image *image1;								// Load a texture
+	Image *image1;											// Load a texture
 
 	// Allocate memory for the texture
 	image1 = (Image *)malloc(sizeof(Image));
 	if (image1 == NULL) {
 		printf("Error allocating space for the image\n");
-		exit(0);								// Quit
+		exit(0);											// Quit
 	}
 	
-	const char * textureFile = "textures/Crate.bmp";			// Declare the filename
+	const char * textureFile = "textures/Glass.bmp";		// Declare the filename
 
 	if (!loadImage(textureFile, image1)) {
 		exit(1);
 	}
 
-	glGenTextures(3, &texture[0]);				// Create the texture
-	glBindTexture(GL_TEXTURE_2D, texture[0]);	// 2D texture (x, y)
+	glGenTextures(3, &texture[0]);							// Create the texture
+	glBindTexture(GL_TEXTURE_2D, texture[0]);				// 2D texture (x, y)
 
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);	// Scale cheaply when img bigger than texture
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);	// Scale cheaply when img smaller than texture
@@ -187,6 +209,10 @@ void initGL(int width, int height)
 	glLightfv(GL_LIGHT1, GL_DIFFUSE, lightDiffuse);	// Add diffusion light
 	glLightfv(GL_LIGHT1, GL_POSITION, lightPosition);	// Set the light position
 	glEnable(GL_LIGHT1);
+
+	// Setup blending 
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE);				// Translucent blending function
+	glColor4f(1.0f, 1.0f, 1.0f, 0.5f);				// Half opacity/translucency
 }
 
 // Resize window if (for some reason) the size is changed
@@ -301,6 +327,19 @@ void keyPressed(unsigned char key, int x, int y)
 			filter +=1;
 			if (filter > 2) {				// Out of range
 				filter = 0;					// back to first filter
+			}
+			break;
+
+		case 98:
+		case 110:							// Switch the blending
+			blend = blend ? 0 : 1;			// Toggle current blend value
+			if (!blend) {
+				glDisable(GL_BLEND);		// Turn off blending
+				glEnable(GL_DEPTH_TEST);	// Turn on depth testing
+			}
+			else {
+				glEnable(GL_BLEND);			// Turn on blending
+				glDisable(GL_DEPTH_TEST);	// Turn off depth testing
 			}
 			break;
 
