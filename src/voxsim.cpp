@@ -5,13 +5,29 @@
 #include <GL/gl.h>			// Header for the OpenGL32 library
 #include <GL/glut.h>		// Header for the GLu32 library
 
-#define ESCAPE	27			// Macro for the escape key
+// Define ascii codes for the keyboard keys
+#define ESCAPE		27			// Macro for the escape key
+#define PAGE_UP		73
+#define PAGE_DN		81
+#define UP_ARROW	72			
+#define DOWN_ARROW	80			
+#define LEFT_ARROW	75			
+#define RIGHT_ARROW	77			
 
 int window;				    // Number of the GLUT window
+int light;					// Lighting (1 = ON, 0 = OFF)
+int lp;						// If 'L' is pressed
+int fp;						// If 'F' is pressed
 
-float rotCx, rotCy, rotCz, rotT;				// Angles of rotation for the cube ad triangle
+GLfloat rotX, rotY, speedX, speedY;			// Angles and speeds of rotation
+GLfloat z = -5.0f;							// Depth into the screen
 
-unsigned int texture[1];									// Storage for one texture
+GLfloat lightAmbient[]  = {0.5f, 0.5f, 0.5f, 1.0f};	// White ambient light half density
+GLfloat lightDiffuse[]  = {1.0f, 1.0f, 1.0f, 1.0f};	// Really bright white light
+GLfloat lightPosition[] = {0.0f, 0.0f, 2.0f, 1.0f};	// Out the screen facing front face
+
+GLuint filter;						// Which of the textures to use
+GLuint texture[3];					// Storage for 3 textures
 
 // Define an image type 
 typedef struct Image {
@@ -101,7 +117,7 @@ int loadImage(const char * filename, Image * image)
 	return 1;
 }
 
-// Load the bitmaps and Convert them to textures
+// Load the bitmaps and convert them to textures
 void loadGlTextures()
 {
 	Image *image1;								// Load a texture
@@ -113,22 +129,38 @@ void loadGlTextures()
 		exit(0);								// Quit
 	}
 	
-	const char * textureFile = "textures/Grass.bmp";			// Declare the filename
+	const char * textureFile = "textures/Crate.bmp";			// Declare the filename
 
 	if (!loadImage(textureFile, image1)) {
 		exit(1);
 	}
 
-	glGenTextures(1, &texture[0]);				// Create the texture
+	glGenTextures(3, &texture[0]);				// Create the texture
 	glBindTexture(GL_TEXTURE_2D, texture[0]);	// 2D texture (x, y)
 
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);	// Scale linearly when img bigger than texture
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);	// Scale linearly when img smaller than texture
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);	// Scale cheaply when img bigger than texture
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);	// Scale cheaply when img smaller than texture
 
 	// Params are:
 	//	[2d tex  ,  detail level     ,  num components, img x size, img y size, border,
 	//	 col data, unsigned byte data, data itself]
 	glTexImage2D(GL_TEXTURE_2D,	0, 3, image1->sizeX, image1->sizeY, 0, GL_RGB, GL_UNSIGNED_BYTE, image1->data);
+
+	// Texture 2 with linear scaling - same functionality as above
+	glBindTexture(GL_TEXTURE_2D, texture[1]);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);	// Scale linearly when img bigger than texture
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);	// Scale linearly when img smaller than texture
+	glTexImage2D(GL_TEXTURE_2D,	0, 3, image1->sizeX, image1->sizeY, 0, GL_RGB, GL_UNSIGNED_BYTE, image1->data);
+
+	// Texture 3 with mipamapped scaling
+	glBindTexture(GL_TEXTURE_2D, texture[2]);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);	
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST);	// Mipmapped
+	glTexImage2D(GL_TEXTURE_2D,	0, 3, image1->sizeX, image1->sizeY, 0, GL_RGB, GL_UNSIGNED_BYTE, image1->data);
+	
+	// Build the mipmapped texture, params are:
+	//	[2D texture, 3 colors, wifth, height, RGB, byte type data, actual data]
+	gluBuild2DMipmaps(GL_TEXTURE_2D, 3, image1->sizeX, image1->sizeY, GL_RGB, GL_UNSIGNED_BYTE, image1->data);
 }
 
 // General OpenGL init. Sets all initial params
@@ -149,6 +181,12 @@ void initGL(int width, int height)
 	gluPerspective(45.f, (GLfloat)width / (GLfloat)height, 0.1f, 100.0f);
 
 	glMatrixMode(GL_MODELVIEW);					// Back to model view matrix
+
+	// Setup a light
+	glLightfv(GL_LIGHT1, GL_AMBIENT, lightAmbient);	// Add ambient light
+	glLightfv(GL_LIGHT1, GL_DIFFUSE, lightDiffuse);	// Add diffusion light
+	glLightfv(GL_LIGHT1, GL_POSITION, lightPosition);	// Set the light position
+	glEnable(GL_LIGHT1);
 }
 
 // Resize window if (for some reason) the size is changed
@@ -164,7 +202,6 @@ void resizeGlScene(int width, int height)
 
 	// Calculate the aspect ratio of the window
 	gluPerspective(45.f, (GLfloat)width / (GLfloat)height, 0.1f, 100.0f);
-
 	glMatrixMode(GL_MODELVIEW);			// Back to model view matrix
 }
 
@@ -175,73 +212,135 @@ void drawGlScene()
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);	
 	
 	// Reset the view
-	glLoadIdentity();						// Reset the view
-	glTranslatef(0.f, 0.0f, -5.0f);		// Move 2.5 units right and 5 in
-	glRotatef(rotCx, 1.0f, 0.0f, 0.0f);		// Rotate quad about x
-	glRotatef(rotCy, 0.0f, 1.0f, 0.0f);		// Rotate quad about y
-	glRotatef(rotCz, 0.0f, 0.0f, 1.0f);		// Rotate quad about z
+	glLoadIdentity();						// Reset the vie
+	glTranslatef(0.f, 0.0f, z);				// Move z units along z axis
+	glRotatef(rotX, 1.0f, 0.0f, 0.0f);		// Rotate x-axis
+	glRotatef(rotY, 0.0f, 1.0f, 0.0f);		// Rotate y-axis
 
-	glBindTexture(GL_TEXTURE_2D, texture[0]);	// Select the texture to use
+	glBindTexture(GL_TEXTURE_2D, texture[filter]);	// Select the texture to use
 
 	// Draw a square 
 	glBegin(GL_QUADS);					// Start drawing a quad
 
 	 // Front Face (note that the texture's corners have to match the quad's corners)
+    glNormal3f( 0.0f, 0.0f, 1.0f);                              // front face points out of the screen on z.
     glTexCoord2f(0.0f, 0.0f); glVertex3f(-1.0f, -1.0f,  1.0f);	// Bottom Left Of The Texture and Quad
     glTexCoord2f(1.0f, 0.0f); glVertex3f( 1.0f, -1.0f,  1.0f);	// Bottom Right Of The Texture and Quad
     glTexCoord2f(1.0f, 1.0f); glVertex3f( 1.0f,  1.0f,  1.0f);	// Top Right Of The Texture and Quad
     glTexCoord2f(0.0f, 1.0f); glVertex3f(-1.0f,  1.0f,  1.0f);	// Top Left Of The Texture and Quad
     
     // Back Face
+    glNormal3f( 0.0f, 0.0f,-1.0f);                              // back face points into the screen on z.
     glTexCoord2f(1.0f, 0.0f); glVertex3f(-1.0f, -1.0f, -1.0f);	// Bottom Right Of The Texture and Quad
     glTexCoord2f(1.0f, 1.0f); glVertex3f(-1.0f,  1.0f, -1.0f);	// Top Right Of The Texture and Quad
     glTexCoord2f(0.0f, 1.0f); glVertex3f( 1.0f,  1.0f, -1.0f);	// Top Left Of The Texture and Quad
     glTexCoord2f(0.0f, 0.0f); glVertex3f( 1.0f, -1.0f, -1.0f);	// Bottom Left Of The Texture and Quad
 	
     // Top Face
+    glNormal3f( 0.0f, 1.0f, 0.0f);                              // top face points up on y.
     glTexCoord2f(0.0f, 1.0f); glVertex3f(-1.0f,  1.0f, -1.0f);	// Top Left Of The Texture and Quad
     glTexCoord2f(0.0f, 0.0f); glVertex3f(-1.0f,  1.0f,  1.0f);	// Bottom Left Of The Texture and Quad
     glTexCoord2f(1.0f, 0.0f); glVertex3f( 1.0f,  1.0f,  1.0f);	// Bottom Right Of The Texture and Quad
     glTexCoord2f(1.0f, 1.0f); glVertex3f( 1.0f,  1.0f, -1.0f);	// Top Right Of The Texture and Quad
     
     // Bottom Face       
+    glNormal3f( 0.0f, -1.0f, 0.0f);                             // bottom face points down on y. 
     glTexCoord2f(1.0f, 1.0f); glVertex3f(-1.0f, -1.0f, -1.0f);	// Top Right Of The Texture and Quad
     glTexCoord2f(0.0f, 1.0f); glVertex3f( 1.0f, -1.0f, -1.0f);	// Top Left Of The Texture and Quad
     glTexCoord2f(0.0f, 0.0f); glVertex3f( 1.0f, -1.0f,  1.0f);	// Bottom Left Of The Texture and Quad
     glTexCoord2f(1.0f, 0.0f); glVertex3f(-1.0f, -1.0f,  1.0f);	// Bottom Right Of The Texture and Quad
     
     // Right face
+    glNormal3f( 1.0f, 0.0f, 0.0f);                              // right face points right on x.
     glTexCoord2f(1.0f, 0.0f); glVertex3f( 1.0f, -1.0f, -1.0f);	// Bottom Right Of The Texture and Quad
     glTexCoord2f(1.0f, 1.0f); glVertex3f( 1.0f,  1.0f, -1.0f);	// Top Right Of The Texture and Quad
     glTexCoord2f(0.0f, 1.0f); glVertex3f( 1.0f,  1.0f,  1.0f);	// Top Left Of The Texture and Quad
     glTexCoord2f(0.0f, 0.0f); glVertex3f( 1.0f, -1.0f,  1.0f);	// Bottom Left Of The Texture and Quad
     
     // Left Face
+    glNormal3f(-1.0f, 0.0f, 0.0f);                              // left face points left on x.
     glTexCoord2f(0.0f, 0.0f); glVertex3f(-1.0f, -1.0f, -1.0f);	// Bottom Left Of The Texture and Quad
     glTexCoord2f(1.0f, 0.0f); glVertex3f(-1.0f, -1.0f,  1.0f);	// Bottom Right Of The Texture and Quad
     glTexCoord2f(1.0f, 1.0f); glVertex3f(-1.0f,  1.0f,  1.0f);	// Top Right Of The Texture and Quad
     glTexCoord2f(0.0f, 1.0f); glVertex3f(-1.0f,  1.0f, -1.0f);	// Top Left Of The Texture and Quad
-
+	
 	glEnd();							// Finished drawing the quad
 
-	rotCx += 1.5f;
-	rotCy += 1.5f;
-	rotCz += 1.5f;
+	rotX += speedX;
+	rotY += speedY;
 
 	// Double buffered so swap the buffers 
 	// to display what was just drawn
 	glutSwapBuffers();
 }
 
-// Function that will check if the escape key is pressed and then exit
+// Function that will check for exit, lighting, and filter
 void keyPressed(unsigned char key, int x, int y)
 {
 	usleep(100);	// No funny behaviour when key presses are too fast
 
-	// If the key is the escape key, exit
-	if (key == ESCAPE) {
-		glutDestroyWindow(window);		// Destroy the GLUT window
-		exit(0);
+	switch(key) {
+		case ESCAPE:						// Close the program
+			glutDestroyWindow(window);		// Destroy the GLUT window
+			exit(0);
+			break;
+
+		case 76:
+		case 108:							// Switch the lighting
+			light = light ? 0 : 1;			// Change light variable
+			if (!light) {
+				glDisable(GL_LIGHTING);		
+			}
+			else {
+				glEnable(GL_LIGHTING);
+			}
+			break;
+
+		case 70:
+		case 102:							// Switch the filter
+			filter +=1;
+			if (filter > 2) {				// Out of range
+				filter = 0;					// back to first filter
+			}
+			break;
+
+		default:
+			break;
+	}
+}
+
+// Function to check for movement 
+void specialKeyPressed(int key, int x, int y)
+{
+	usleep(100);						// Again no funny behaviour
+
+	switch(key) {
+		case GLUT_KEY_PAGE_UP:
+			z -= 0.2f;
+			break;
+
+		case GLUT_KEY_PAGE_DOWN:
+			z += 0.2f;
+			break;
+
+		case GLUT_KEY_UP:
+			speedX += 0.1f;
+			break;
+
+		case GLUT_KEY_DOWN:
+			speedX -= 0.1f;
+			break;
+
+		case GLUT_KEY_LEFT:
+			speedY -= 0.1f;
+			break;
+
+		case GLUT_KEY_RIGHT: 
+			speedY += 0.1f;
+			break;
+
+		default:
+			break;
 	}
 }
 
@@ -279,6 +378,9 @@ int main(int argc, char **argv)
 	// Register the keyboard checking function
 	glutKeyboardFunc(&keyPressed);
 
+	// Check the movement functions 
+	glutSpecialFunc(&specialKeyPressed);
+	
 	// Init GL - the window
 	initGL(640, 480);
 
