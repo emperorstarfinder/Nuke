@@ -41,7 +41,7 @@ TEST_EXE 	= $(addprefix $(BUILD_DIR)/,$(TEST_EXE_NAME))
 COM_MODULES  = voxsim.cpp
 TST_MODULES  = test.cpp
 TGT_MODULES  = 
-OTH_MODULES  = stars.cpp
+OTH_MODULES  = world.cpp
 
 COM_SOURCES  = $(addprefix $(SRC_DIR)/,$(COM_MODULES))
 TST_SOURCES  = $(addprefix $(TST_DIR)/,$(TST_MODULES))
