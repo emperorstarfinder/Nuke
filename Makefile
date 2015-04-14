@@ -5,10 +5,10 @@
 #										  #		
 ###########################################
 
-EXE_LINUX 	  = voxsim-lin
-EXE_WINDW 	  = voxsim-win
+EXE_LINUX 	  = nuke-lin
+EXE_WINDW 	  = nuke-win
 EXE_OTH		  = other
-TEST_EXE_NAME = voxsim-tests
+TEST_EXE_NAME = nuke-lin-tests
 
 ###########################################
 # 			DIRECTORIES					  #
@@ -38,10 +38,10 @@ TEST_EXE 	= $(addprefix $(BUILD_DIR)/,$(TEST_EXE_NAME))
 # 				SOURCES					 #
 ##########################################
 
-COM_MODULES  = voxsim.cpp
-TST_MODULES  = test.cpp
+COM_MODULES  = nuke.cpp
+TST_MODULES  = tests.cpp
 TGT_MODULES  = 
-OTH_MODULES  = world.cpp
+OTH_MODULES  = other.cpp
 
 COM_SOURCES  = $(addprefix $(SRC_DIR)/,$(COM_MODULES))
 TST_SOURCES  = $(addprefix $(TST_DIR)/,$(TST_MODULES))
@@ -78,21 +78,21 @@ LIB_DIRS 	= /usr/lib
 
 CXX 		= g++
 WXX			= x86_64-w64-mingw32-g++
-CXX_FLAGS 	= 
+CXX_FLAGS 	= -g -O3
 WXX_FLAGS   =
 
-.PHONY: all vsim vtests
+.PHONY: all nuke nuketests
 
 # No win or tests till this works (may be a while)
-all: vsim other
+all: nuke other
 
-vsim: $(EXE_LIN)
+nuke: $(EXE_LIN)
 
 other: $(EXE_OTHER)
 
 win: $(EXE_WIN)				
 
-vtests: $(TEST_EXE)
+nuketests: $(TEST_EXE)
 
 $(EXE_LIN):
 	$(CXX) $(CXX_FLAGS) $(COM_SOURCES) $(TGT_SOURCES) -o $(EXE_LIN)  \

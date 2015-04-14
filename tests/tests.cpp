@@ -1,12 +1,8 @@
-// Test file for VoxSim - using google test
+/**
+ * Author:		 Rob Clucas 
+ *
+ * Description:	 Unit test file for the Nuke game.
+ *
+ */
 
-#include <iostream>
 
-using namespace std;
-
-int main(int argc, char** argv)
-{
-	cout << "Google Unit Test file =)" << endl;
-
-	return 0;
-}
