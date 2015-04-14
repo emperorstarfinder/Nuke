@@ -1,17 +1,21 @@
-# VoxSim
-VoxSim is an attempt to make a 3D physics simulator using voxels and both CUDA and OpenGL for the scientific computation and rendering respectively. It's also going to allow simulations to be described by the user, or to be created simply, so that it can be used academically by people who don't have the required coding knowledge.
+# Nuke
+Nuke is a multiplayer online game where each user has a 'vehicle' (not sure exactly what this will be yet - I'm thinking some sort of ship) with offensive and defensive abilities. The aim is not yet defined, but currently the idea is to get more points than the other players, or if a team aspect is implemented for the team to get more points than the other team.
 
 ## Current Status
-Currently I am in the process of learning OpenGL, which is what the souce and the executables will reflect. After that I will move on to Voxels and rendering them on the GPU so that VoxSim can come alive =D
+Currently I am in the process of learning OpenGL, which is what the souce and the executables will reflect. This will be a slow process until I know enough to implement some cool features.
+u
+## Environments
+I'm developing this in Ubuntu 14.04 with gcc version 4.8. The intention is to port the game to Windows, OSX, iOS and Android, but this will happen when the Ubuntu test version is worth porting.
 
 ## Building
-To build VoxSim make sure that all of the prerequisits are installed and working - see Prerequisits section. The when in the project root directoy (where the Makefile is) run:
+To build Nuke make sure that all of the prerequisits are installed and working - see Prerequisits section. The when in the project root directoy (where the Makefile is) run:
 ```python
-$ make vsim   # To make VoxSim linux executable
-$ make vtests # To make VoxSim Unit tests executable
+$ make nuke   # To make Nuke linux executable
+$ make nuketests # To make Nuke Unit tests executable
 $ make clean  # Clean both the executables
 ```
 
-Note that all executables are built to the builds directory and are for linux.
+## Prerequisits 
+You will need OpenGL and GLES to run the Linux executables.
 
 
