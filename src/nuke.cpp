@@ -32,8 +32,13 @@ GLfloat lookupdown = 0.0;
 
 // Define the radin<->degree conversion 
 const float piover180 = 0.0174532925f;
+const float PI		  = 3.14159;
 
 float heading, xpos, zpos;
+
+float points[45][45][3];			// Points for the flag waves
+
+int sintoggle = 0;					// If the point in the array must be moved
 
 GLfloat camx, camy, camz;			// Cameraposition variables
 GLfloat throtate;					// Rotation
@@ -45,7 +50,7 @@ GLfloat lightDiffuse[]  = {1.0f, 1.0f, 1.0f, 1.0f};
 GLfloat lightPosition[] = {0.0f, 0.0f, 2.0f, 1.0f};
 
 GLuint loop;						// Variable for the loop number
-GLuint texture[3];					// Storage for 3 textures
+GLuint texture[4];					// Storage for 3 textures
 
 GLuint filter = 0;					// Variable for chosing the texture
 
@@ -234,33 +239,45 @@ int loadImage(const char * filename, Image * image)
 // Load the bitmaps and convert them to textures
 void loadGlTextures()
 {
-	Image *image1;											// Load a texture
+	Image* image1;											// Textures for the walls
+	Image* flagImage;
 
-	// Allocate memory for the texture
+	// Allocate memory for the wall texture
 	image1 = (Image *)malloc(sizeof(Image));
 	if (image1 == NULL) {
-		printf("Error allocating space for the image\n");
+		printf("Error allocating space for the wall image\n");
 		exit(0);											// Quit
 	}
-	
-	const char * textureFile = "textures/Crate.bmp";		// Declare the filename
 
-	if (!loadImage(textureFile, image1)) {
+	// Allocate memory for the flag texture
+	flagImage = (Image *)malloc(sizeof(Image));
+	if (flagImage == NULL) {
+		printf("Error allocating space for the flag image\n");
+		exit(0);
+	} 
+
+	const char* wallFile = "textures/Crate.bmp";		
+	const char* flagFile = "textures/Flag.bmp";			
+
+	if (!loadImage(wallFile, image1)) {
+		exit(1);
+	}
+	if (!loadImage(flagFile, flagImage)) {
 		exit(1);
 	}
 
-	glGenTextures(3, &texture[0]);							// Create the texture
+	glGenTextures(4, &texture[0]);							// Create the texture
 	glBindTexture(GL_TEXTURE_2D, texture[0]);				// 2D texture (x, y)
 
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);	// Scale cheaply when img bigger than texture
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);	// Scale cheaply when img smaller than texture
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);	// Scale linearly when img bigger than texture
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);	// Scale linearly when img smaller than texture
 
 	// Params are:
 	//	[2d tex  ,  detail level     ,  num components, img x size, img y size, border,
 	//	 col data, unsigned byte data, data itself]
 	glTexImage2D(GL_TEXTURE_2D,	0, 3, image1->sizeX, image1->sizeY, 0, GL_RGB, GL_UNSIGNED_BYTE, image1->data);
 
-	// Linar filter section
+	// Cheap filter section
     glBindTexture(GL_TEXTURE_2D, texture[1]);	
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
@@ -271,6 +288,12 @@ void loadGlTextures()
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR); 
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST);
 	gluBuild2DMipmaps(GL_TEXTURE_2D, 3, image1->sizeX, image1->sizeY, GL_RGB, GL_UNSIGNED_BYTE, image1->data);
+
+	// Linear filter for the map
+	glBindTexture(GL_TEXTURE_2D, texture[3]);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexImage2D(GL_TEXTURE_2D, 0, 3, flagImage->sizeX, flagImage->sizeY, 0, GL_RGB, GL_UNSIGNED_BYTE, flagImage->data);
 }
 
 // General OpenGL init. Sets all initial params
@@ -298,6 +321,15 @@ void initGL(int width, int height)
 	glLightfv(GL_LIGHT1, GL_DIFFUSE, lightDiffuse);
 	glLightfv(GL_LIGHT1, GL_POSITION, lightPosition);
 	glEnable(GL_LIGHT1);	
+
+	// Initialise values for the points arrays
+	for (float x = 0.0f; x < 9.0f; x += 0.2f) {
+		for (float y = 0.0f; y < 9.0f; y += 0.2f) {
+			points[ (int)(5*x) ][ (int)(5*y) ][0] = x - 4.4f;
+			points[ (int)(5*x) ][ (int)(5*y) ][1] = y - 4.4f;
+			points[ (int)(5*x) ][ (int)(5*y) ][2] = (float)(sin(((5*8*x)/360.f) * PI * 2.f));
+		}
+	}
 }
 
 // Resize window if (for some reason) the size is changed
@@ -322,7 +354,8 @@ void drawGlScene()
 	GLfloat xm, ym, zm, um, vm;								// Temp variables
 	GLfloat xtrans, ytrans, ztrans;							// Temp transformations
 	GLfloat sceneroty;										// Y axis screen rotation
-	int numtriangles;
+	int numtriangles;										// Num triangles for the world
+	float _x, _y, _xb, _yb;									// Loop counters
 
 	// Do some calculations 
 	xtrans = -xpos;
@@ -344,11 +377,11 @@ void drawGlScene()
 	// Get the number of triangles
 	numtriangles = sector.numtriangles;
 
-	// Go through all the triangles
+	// Go through all the triangles to draw the world
 	for (loop = 0; loop < numtriangles; loop++) {
 		glBegin(GL_TRIANGLES);
 		glNormal3f(0.f, 0.f, 1.0f);							// Define the normal 
-
+ 
 		xm = sector.triangle[loop].vertex[0].x;
 		ym = sector.triangle[loop].vertex[0].y;
 		zm = sector.triangle[loop].vertex[0].z;
@@ -375,6 +408,53 @@ void drawGlScene()
 
 		glEnd();
 	}
+
+	// Reset the view
+	//glLoadIdentity();	
+	glTranslatef(3.0f, 0.0f, -34.f);							// Go to flag position
+	//glBindTexture(GL_TEXTURE_2D, texture[3]);				// Load flag texture
+	
+	//glPolygonMode(GL_BACK, GL_FILL);
+	//glPolygonMode(GL_FRONT, GL_LINE);
+
+	/*glBegin(GL_QUADS);
+
+	for (int x = 0; x < 44; x++) {
+		for (int y = 0; y < 44; y++) {
+			_x  = (float) (x) / 44;
+			_y  = (float) (y) / 44;
+			_xb = (float) (x + 1) / 44;
+			_yb = (float) (y + 1) / 44;
+
+			glTexCoord2f(_x, _y);
+			glVertex3f(points[x][y][0], points[x][y][1], points[x][y][2]);
+			
+			glTexCoord2f(_x, _yb);
+			glVertex3f(points[x][y+1][0], points[x][y+1][1], points[x][y+1][2]);
+			
+			glTexCoord2f(_xb, _yb);
+			glVertex3f(points[x+1][y+1][0], points[x+1][y+1][1], points[x+1][y+1][2]);
+			
+			glTexCoord2f(_xb, _y);
+			glVertex3f(points[x+1][y][0], points[x+1][y][1], points[x+1][y][2]);
+		}
+    }
+
+	glEnd();*/
+
+	// Check if the sine values must be toggled
+	if (sintoggle == 2) {
+		for (int y = 0; y < 45; y++) {
+			points[44][y][2] = points[0][y][2];
+		}
+		for (int x = 0; x < 44; x++) {
+			for (int y = 0; y < 45; y++) {
+				points[x][y][2] = points[x+1][y][2];
+			}
+		}
+		sintoggle = 0;
+	}
+	sintoggle++;
 
 	// Double buffered so swap the buffers 
 	// to display what was just drawn
