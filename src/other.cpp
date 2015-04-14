@@ -349,6 +349,34 @@ void keyPressed(unsigned char key, int x, int y)
 	}
 }
 
+// Function for dealing with the movement
+void specialKeyPressed(int key, int x, int y)
+{
+	// Aviod thrashing the key
+	usleep(100);
+
+	switch (key) {
+		case GLUT_KEY_UP:
+				rotX -= 1.f;
+				break;
+				
+		case GLUT_KEY_DOWN:
+				rotX += 1.f;
+				break;
+
+		case GLUT_KEY_LEFT:
+				rotY -= 1.f;
+				break;
+
+		case GLUT_KEY_RIGHT:
+				rotY += 1.f;		
+				break;
+
+		default:
+				printf("Special key pressed, but no action yet");
+				break;
+	}
+}
 
 int main(int argc, char **argv) 
 {
@@ -383,6 +411,9 @@ int main(int argc, char **argv)
 
 	// Register the keyboard checking function
 	glutKeyboardFunc(&keyPressed);
+
+	// Check for the special keys
+	glutSpecialFunc(&specialKeyPressed);
 	
 	// Init GL - the window
 	initGL(640, 480);
