@@ -367,6 +367,8 @@ void drawGlScene()
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);	
 	glLoadIdentity();
 
+	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+
 	glRotatef(lookupdown, 1.0f, 0.f, 0.f);
 	glRotatef(sceneroty, 0.f, 1.0f, 0.f);
 
@@ -411,13 +413,13 @@ void drawGlScene()
 
 	// Reset the view
 	//glLoadIdentity();	
-	glTranslatef(3.0f, 0.0f, -34.f);							// Go to flag position
-	//glBindTexture(GL_TEXTURE_2D, texture[3]);				// Load flag texture
+	glTranslatef(3.0f, 2.0f, -3.f);							// Go to flag position
+	glBindTexture(GL_TEXTURE_2D, texture[3]);				// Load flag texture
 	
-	//glPolygonMode(GL_BACK, GL_FILL);
-	//glPolygonMode(GL_FRONT, GL_LINE);
+	glPolygonMode(GL_BACK, GL_FILL);
+	glPolygonMode(GL_FRONT, GL_LINE);
 
-	/*glBegin(GL_QUADS);
+	glBegin(GL_QUADS);
 
 	for (int x = 0; x < 44; x++) {
 		for (int y = 0; y < 44; y++) {
@@ -440,7 +442,7 @@ void drawGlScene()
 		}
     }
 
-	glEnd();*/
+	glEnd();
 
 	// Check if the sine values must be toggled
 	if (sintoggle == 2) {
@@ -572,7 +574,7 @@ int main(int argc, char **argv)
 	glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_ALPHA | GLUT_DEPTH);
 
 	// Define a 640 x 480 window
-	glutInitWindowSize(640, 480);
+	glutInitWindowSize(1280, 960);
 
 	// Make the window co-ords be top left of screen
 	glutInitWindowPosition(0, 0);
@@ -599,7 +601,7 @@ int main(int argc, char **argv)
 	glutSpecialFunc(&specialKeyPressed);
 	
 	// Init GL - the window
-	initGL(640, 480);
+	initGL(1280, 960);
 
 	// Start the event loop
 	glutMainLoop();
