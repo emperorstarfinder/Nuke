@@ -67,8 +67,24 @@ class Particles
 			}
 		}
 
-		/** Update the states of the particles. */
+		/** Update the states of the particles.
+		 *  Currently just kill all the dead particles.
+		 */
 		void Update() throw() {
+			actionPolicy.PrepareAction();								// Prepare all action policies
+			for (size_t count = 0; count < activeCount; ) {				// Kill all dead particles
+				actionPolicy(particleArray[count]);						// Apply all the action policies to the particle
+				if (particleArray[count].life < 0) {			
+					// Particle is dead so swap it to the last active article in the array
+					particleArray[count] = particleArray[activeCount];
+					activeCount--;										// Decrease number of active particles
+				}
+				else {
+					// If it isn't dead, move to the next one (swapped one could
+					// also be dead and we can't miss any dead particles)
+					++count;
+				}
+			}
 		}
 	private :
 		/** The number of currently active particles in the sytem. */

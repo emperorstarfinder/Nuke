@@ -34,6 +34,15 @@ class CompletePolicy
 		}
 };
 
+/*------ ----- ---- --- -- - Null policy - -- --- ---- ----- ------*/
+
+/** 
+ * \class Null policy which can be used as a placeholder for when there is no relevant
+ * policy. */
+template <class ParticleType>
+class NullPolicy
+{
+}
 
 /*------ ----- ---- --- -- - Initializer Policies - -- --- ---- ----- ------*/
 
@@ -50,24 +59,16 @@ class LifeInitializer
 		float lifeDecayRate;	/**< The rate of decay of the life.				*/
 	public :
 		/** Constructs the life initializer. */
-		explicit LifeInitializer() throw() : maxLife(1.f), minLife(0.f), lifeDecayRate(0.001f)  {}
+		explicit LifeInitializer() throw() : maxLife(1.f), minLife(0.f)  {}
 
 		/** Sets the range of the particle's life.
 		 *
 		 * @param _minLife The min amount of life for the particle.
 		 * @param _maxLife The max amount of life for the particle.
 		 */
-		inline void SetLifeRange(const float& _mineLife, const float& _maxLife) throw (double, int) {
+		inline void SetLifeRange(const float& _minLife, const float& _maxLife) throw (double, int) {
 			minLife = _minLife;
 			maxLife = _maxLife;
-		}
-
-		/** Sets the rate of life decay for the particle.
-		 *
-		 * @param _decayRate The speed at which the life should decay
-		 */
-		inline void SetLifeDecayRate(const float& _decayRate) throw(double, int) {
-			lifeDecayRate = _decayRate;
 		}
 
 		/** Allows random generation of the amount of life for a particle.
@@ -83,14 +84,45 @@ class LifeInitializer
 /*------ ----- ---- --- -- - Action Policies - -- --- ---- ----- ------*/
 
 /** 
+ * \class Action policy used to perform the actions applied to particle life.
+ */
+template <class ParticleType>
+class LifeAction
+{
+	public:
+		/** The rate at which the life of a particle decays. */
+		float decayRate;
+	public:
+		/** Constructs a life action policy. */
+		explicit LifeAction() throw() : decayRate(0.001f) {}
+
+		/** Performs any necessary preparation for a life policy. */
+		inline void PrepareAction() throw() {}
+
+		/** Defines the actions which must be performed when the life action
+		 * acts on the particle.
+		 *
+		 * @param particle The particle on which the life action acts. */
+		inline void operator() (ParticleType& particle) const throw() {
+			particle.life -= decayRate;
+		}
+};
+/** 
  * \class Action policy class used to perform particle movement.
  */
 template <class ParticleType>
 class MoveAction
 {
 	public:
+		/** Performs any necessary setup before the action can act. */
+		inline void PrepareAction() throw() {}
+
+		/** Defines the actions which must be performed when the life action
+		 * acts on the particle. 
+		 *
+		 * @param particle The particle on which the life action must act. */
 		inline void operator() (ParticleType& particle) const throw() {
-			// Opengl vectors act elementwise
+			// Opengl vectors act elementwise, update all dimensions in one call
 			particle.pos += particle.velocity;
 		}
 };
