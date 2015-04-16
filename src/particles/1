@@ -5,9 +5,6 @@
  *
  */
 
-#ifndef __NUKE_PARTICLE_POLICIES__
-#define __NUKE_PARTICLE_POLICIES__
-
 #include "Particle.h"
 #include <cstdlib>				// Rand()
 
@@ -94,5 +91,3 @@ class MoveAction
 			particle.pos += particle.velocity;
 		}
 };
-
-#endif // __NUKE_PARTICLE_POLICIES__

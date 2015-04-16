@@ -15,11 +15,11 @@
  */
 struct Particle 
 {
-	vec3 pos;		/**< Particle position. */
-	vec3 vel;		/**< Particle velocity. */
-	vec4 color;		/**< Particle color.	*/
-	vec3 size;		/**< Particle size.		*/
-	float life;		/**< Particle life.		*/
+	vec3 pos;			/**< Particle position. */
+	vec3 velocity;		/**< Particle velocity. */
+	vec4 color;			/**< Particle color.	*/
+	vec3 size;			/**< Particle size.		*/
+	float life;			/**< Particle life.		*/
 };
 
 #endif // __NUKE_PARTICLE__
