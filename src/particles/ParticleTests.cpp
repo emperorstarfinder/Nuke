@@ -120,6 +120,37 @@ TEST_F(ParticleTest, ParticlesMoveCorrectlyForVelocityWithNoEffects)
 		EXPECT_EQ(vec3(1.f, 2.f, 3.f), testParticles[i].pos);
 	}
 }
+
+TEST_F(ParticleTest, ColorCenBeSetCorrectly)
+{	
+	// Make 1000 particles active
+	ParticlesLarge.Emit(1000, vec3(0.0f, 0.0f, 0.0f));
+
+	// Get a pointer to the particles
+	const Particle* testParticles = ParticlesLarge.GetParticles();
+
+	// Check that their velocities are correct
+	for (size_t i = 0; i < 1000; i++) {
+		EXPECT_EQ(vec4(1.f, 1.f, 1.f, 0.f), testParticles[i].color);
+	}
+}
+
+TEST_F(ParticleTest, ParticlesCanChangeColor)
+{
+	// Set the color of the particles to red (rather than default white)
+	ParticlesMed.initializerPolicy.colorPolicy.SetColor(vec4(1.f, 0.f, 0.f, 0.f));
+	
+	// Make them active at the origin
+	ParticlesMed.Emit(100, vec3(0.0f, 0.0f, 0.0f));
+
+	// Get a pointer to the particles
+	const Particle* testParticles = ParticlesMed.GetParticles();
+
+	// Check that the positions have been moved from the origin
+	for (size_t i = 0; i < 100; i++) {
+		EXPECT_EQ(vec4(1.f, 0.f, 0.f, 0.f), testParticles[i].color);
+	}
+}
 int main(int argc, char** argv)
 {
 	testing::InitGoogleTest(&argc, argv);

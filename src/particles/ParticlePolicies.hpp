@@ -34,17 +34,19 @@
  * Simply create a new policy and add it to the template list when more
  * functionality is required.
  */
-template <class ParticleType, class LifePolicy, class VelocityPolicy, class MovementPolicy>
+template <class ParticleType, class LifePolicy, class ColorPolicy, class VelocityPolicy, class MovementPolicy>
 class CompletePolicy
 {
 	public :
 		LifePolicy lifePolicy;				/**< Life policy for the particle.       */
+		ColorPolicy colorPolicy;			/**< Color policy for the particles.	 */
 		VelocityPolicy velocityPolicy;		/**< Velocity policy for the particles.  */
 		MovementPolicy movementPolicy;		/**< Movement policy for the particles.  */
 
 		/** Function to prepare all the actions for the policies. */
 		inline void PrepareAction() throw() {
 			lifePolicy.PrepareAction();
+			colorPolicy.PrepareAction();
 			velocityPolicy.PrepareAction();
 			movementPolicy.PrepareAction();
 		}
@@ -56,6 +58,7 @@ class CompletePolicy
 		 */
 		inline void operator() (ParticleType& particle) const throw() {
 			lifePolicy(particle);				// Give particle life
+			colorPolicy(particle);				// Give the particle color
 			velocityPolicy(particle);			// Perform velocity related actions
 			movementPolicy(particle);			// Move the particle
 		}
@@ -112,9 +115,39 @@ class LifeInitializer
 		}	
 };
 
+/** 
+ * \class Initializer policy class used to initialize the color of a group of
+ * particles.
+ */
+template <class ParticleType>
+class ColorInitializer
+{
+	public : 
+		vec4 color;				/**< Color to make the particles. */
+	public :
+		/** Constructs a default color as white, completely opaque. */
+		explicit ColorInitializer() throw() : color(1.f, 1.f, 1.f, 0.f) {}
+
+		/** Set the color that the particles will be made. 
+		 *
+		 * @param _color The color which the particles will be.
+		 */
+		inline void SetColor(const vec4& _color) throw() {
+			color = _color;
+		}
+
+		/** Sets the color of the particle(s).
+		 *
+		 * @param particle The particle for which the color must be set. 
+		 */
+		inline void operator() (ParticleType& particle) const throw() {
+			particle.color = color;
+		}
+};
+
 /**
  * \class Initializer policy class used to initialize the velocity of a
- * particle.
+ * group of particles.
  */
 template <class ParticleType>
 class VelocityInitializer
@@ -190,9 +223,11 @@ class MoveAction
 };
 
 // Typedefs so that the rest of the program looks nice
-typedef CompletePolicy<Particle, LifeInitializer<Particle>, VelocityInitializer<Particle>, NullPolicy<Particle> >
-		ParticleInitializer;
-typedef CompletePolicy<Particle, LifeAction<Particle>, NullPolicy<Particle>, MoveAction<Particle> >       
-        ParticleAction;
+typedef CompletePolicy<Particle, LifeInitializer<Particle>, ColorInitializer<Particle>, VelocityInitializer<Particle>, 
+						NullPolicy<Particle> >
+						ParticleInitializer;
+typedef CompletePolicy<Particle, LifeAction<Particle>, NullPolicy<Particle>, NullPolicy<Particle>, 
+						MoveAction<Particle> >       
+						ParticleAction;
 
 #endif // __NUKE_PARTICLE_POLICIES__
