@@ -18,4 +18,18 @@ $ make clean  # Clean both the executables
 ## Prerequisits 
 You will need OpenGL and GLES to run the Linux executables.
 
+The matrix and vector library which is used is (OpenGL
+Maathematics)[http://glm.g-truc.net/0.9.6/index.html].  Go to the downloads page
+and get the latest version.
+
+It is really easy to install - they provide a cmake script. Simply type 
+```cmake``` 
+And the output will provide the available platforms at the bottom. Then type 
+```cmake -G "Platform"```
+where "Platform" is you platform, for example __"Unix Makefiles"__. Then type
+```make``` 
+to make the library.
+ 
+__Note:__ All this does is move the __glm__ firectory to the includes directory, so you
+could do that without cmake instead, if that's your preference.
 
