@@ -38,7 +38,7 @@ class Particles
 		ActionPolicy actionPolicy;
 
 		/** Construct the particles. */
-		explicit Particles() throw() {}
+		explicit Particles() throw() : activeCount(0) {}
 
 		/** Destruct the particles. */
 		~Particles() throw() {}
@@ -76,13 +76,15 @@ class Particles
 				activeCount += amount;									// Create more particles
 				for (; numActive < activeCount; numActive++) {			// Add particle to the system at end of array
 					particleArray[numActive].pos = _position;			
-					initializePolicy(particleArray[numActive]);			// Initialize the particle
+					initializerPolicy(particleArray[numActive]);		// Initialize the particle
 				}
 			}
 		}
 
-		/** Update the states of the particles.
-		 *  Currently just kill all the dead particles.
+		/** 
+		 * Update the states of the particles.
+		 * This involves performing all the actions defined by the action
+		 * policies and getting rid of 'dead' pparticles.
 		 */
 		void Update() throw() {
 			actionPolicy.PrepareAction();								// Prepare all action policies

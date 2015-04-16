@@ -34,13 +34,20 @@
  * Simply create a new policy and add it to the template list when more
  * functionality is required.
  */
-template <class ParticleType, class LifePolicy, class MovementPolicy>
+template <class ParticleType, class LifePolicy, class VelocityPolicy, class MovementPolicy>
 class CompletePolicy
 {
 	public :
-		LifePolicy lifePolicy;	/**< Life policy for the particle. */
+		LifePolicy lifePolicy;				/**< Life policy for the particle.       */
+		VelocityPolicy velocityPolicy;		/**< Velocity policy for the particles.  */
+		MovementPolicy movementPolicy;		/**< Movement policy for the particles.  */
 
-		/** Function to setup the actions of the policies. */
+		/** Function to prepare all the actions for the policies. */
+		inline void PrepareAction() throw() {
+			lifePolicy.PrepareAction();
+			velocityPolicy.PrepareAction();
+			movementPolicy.PrepareAction();
+		}
 
 		/** Function to initialise the policies. The policies set their
 		 * relevant parameters in the particle. 
@@ -49,6 +56,8 @@ class CompletePolicy
 		 */
 		inline void operator() (ParticleType& particle) const throw() {
 			lifePolicy(particle);				// Give particle life
+			velocityPolicy(particle);			// Perform velocity related actions
+			movementPolicy(particle);			// Move the particle
 		}
 };
 
@@ -60,6 +69,9 @@ class CompletePolicy
 template <class ParticleType>
 class NullPolicy
 {
+	public :
+		inline void PrepareAction() throw() {}
+		inline void operator() (ParticleType& particle) const throw() {}
 };
 
 /*------ ----- ---- --- -- - Initializer Policies - -- --- ---- ----- ------*/
@@ -74,10 +86,9 @@ class LifeInitializer
 		float minLife;			/**< The min amount of life for the particle.	*/
 	private :
 		float maxLife;			/**< The max amount of life for the particle.	*/
-		float lifeDecayRate;	/**< The rate of decay of the life.				*/
 	public :
 		/** Constructs the life initializer. */
-		explicit LifeInitializer() throw() : maxLife(1.f), minLife(0.f)  {}
+		explicit LifeInitializer() throw() : minLife(0.1f), maxLife(1.f) {}
 
 		/** Sets the range of the particle's life.
 		 *
@@ -89,14 +100,47 @@ class LifeInitializer
 			maxLife = _maxLife;
 		}
 
-		/** Allows random generation of the amount of life for a particle.
+		/** Allows random generation of the amount of life for a particle. Where
+		 * the random life range is 0.1 -> 1 by default but can be set using the
+		 * SetLifeRange function.
 		 *
 		 * @param particle The particle for which the amount of life should be
 		 * randomized.
 		 */
 		inline void operator() (ParticleType& particle) const throw() {
-			particle.life = fmod(minLife + rand(), maxLife);
+			particle.life = minLife + static_cast<float>(rand()) / static_cast<float>(RAND_MAX/(maxLife - minLife));
 		}	
+};
+
+/**
+ * \class Initializer policy class used to initialize the velocity of a
+ * particle.
+ */
+template <class ParticleType>
+class VelocityInitializer
+{
+	public :
+		vec3 velocity;			/**< Velocity for the particles. */
+	public :
+		/** Constructs the velocity initializer with a zero velocity */
+		explicit VelocityInitializer() throw() : velocity(vec3(0.f)) {}
+
+		/** Sets the velocity to initialize the particles with.
+		 *
+		 * @param _velocity The velocity the particles should have.
+		 */
+		inline void SetVelocity(const vec3& _velocity) throw() {
+			velocity = _velocity;
+		}
+
+		/** Sets the velocity of the particle on which it acts to be the
+		 * velocity defined by the class velocity variable.
+		 *
+		 * @param particle The particle for which the velocity must be set.
+		 */
+		inline void operator() (ParticleType& particle) const throw() {
+			particle.velocity = velocity;
+		}
 };
 
 /*------ ----- ---- --- -- - Action Policies - -- --- ---- ----- ------*/
@@ -146,7 +190,9 @@ class MoveAction
 };
 
 // Typedefs so that the rest of the program looks nice
-typedef CompletePolicy<Particle, LifeInitializer<Particle>, NullPolicy<Particle> >  particleInitializer;
-typedef CompletePolicy<Particle, LifeAction<Particle>, MoveAction<Particle> >       particleAction;
+typedef CompletePolicy<Particle, LifeInitializer<Particle>, VelocityInitializer<Particle>, NullPolicy<Particle> >
+		ParticleInitializer;
+typedef CompletePolicy<Particle, LifeAction<Particle>, NullPolicy<Particle>, MoveAction<Particle> >       
+        ParticleAction;
 
 #endif // __NUKE_PARTICLE_POLICIES__
