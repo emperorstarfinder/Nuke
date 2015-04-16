@@ -69,11 +69,11 @@ class Particles
 		void Emit(const size_t& _amount, const vec3& _position) {
 			size_t amount = _amount;									// Can't change _amount
 			if ((NumActiveParticles() + amount) > MaxParticles()) {		// Too many particles for system
-				amount = MaxParticles() - NumActivePatricles();			// Set to max number of particles that can be added C
+				amount = MaxParticles() - NumActiveParticles();			// Set to max number of particles that can be added C
 			}
 			if (amount > 0) {											// Check valid amount
-				size_t numActive    = activeCount;						// Counter for the new particles to be added
-				size_t activeCount += amount;							// Create more particles
+				size_t numActive = activeCount;							// Counter for the new particles to be added
+				activeCount += amount;									// Create more particles
 				for (; numActive < activeCount; numActive++) {			// Add particle to the system at end of array
 					particleArray[numActive].pos = _position;			
 					initializePolicy(particleArray[numActive]);			// Initialize the particle

@@ -22,18 +22,19 @@
 #define __NUKE_PARTICLE_POLICIES__
 
 #include "Particle.h"
-#include <cstdlib>				// Rand()
+#include <cstdlib>				// rand()
+#include <math.h>				// fmod()
 
-// Typedefs so that the rest of the program looks nice
-typedef CompletePolicy<Particle, LifeInitializer<Particle>, NullPolicy<Particle> >  particleInitializer;
-typedef CompletePolicy<Particle, LifeAction<Particle>, MoveAction<Particle> >       particleAction;
+// Note: The typedefs which define the instances of these policy classes are 
+//		 at the bottom of the file so that no forward declaration is needed 
+//		 which will result in clutter at the top of the file.
 
 /** 
  * \class Complete policy which defines all the policies which must be used.
  * Simply create a new policy and add it to the template list when more
  * functionality is required.
  */
-template <class ParticleType, class LifePolicy>
+template <class ParticleType, class LifePolicy, class MovementPolicy>
 class CompletePolicy
 {
 	public :
@@ -59,14 +60,14 @@ class CompletePolicy
 template <class ParticleType>
 class NullPolicy
 {
-}
+};
 
 /*------ ----- ---- --- -- - Initializer Policies - -- --- ---- ----- ------*/
 
 /**
  *  \class Initialize policy class used to initialize the life of a particle.
  */
-template <class PaticleType>
+template <class ParticleType>
 class LifeInitializer
 {
 	public :
@@ -94,7 +95,7 @@ class LifeInitializer
 		 * randomized.
 		 */
 		inline void operator() (ParticleType& particle) const throw() {
-			particle.life = minLife + rand() % maxLife;
+			particle.life = fmod(minLife + rand(), maxLife);
 		}	
 };
 
@@ -143,5 +144,9 @@ class MoveAction
 			particle.pos += particle.velocity;
 		}
 };
+
+// Typedefs so that the rest of the program looks nice
+typedef CompletePolicy<Particle, LifeInitializer<Particle>, NullPolicy<Particle> >  particleInitializer;
+typedef CompletePolicy<Particle, LifeAction<Particle>, MoveAction<Particle> >       particleAction;
 
 #endif // __NUKE_PARTICLE_POLICIES__
