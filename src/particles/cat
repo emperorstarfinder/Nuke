@@ -1,0 +1,1 @@
+g++ -std=c++11 -g Particles.hpp ParticlePolicies.hpp ParticleTests.cpp  -o particleTests -lgtest -lgtest_main -lpthread -lGL -lGLU -lglut -lm -lGLEW

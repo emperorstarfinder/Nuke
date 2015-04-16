@@ -1,5 +1,5 @@
 /*
- *  Particle class for Nuke.
+ *  Particles test file for Nuke.
  *
  *  Copyright (C) 2015 Rob Clucas robclu1818@gmail.com
  *
@@ -18,26 +18,10 @@
  *	Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#ifndef __NUKE_PARTICLE__
-#define __NUKE_PARTICLE__
+#include "Particles.hpp"
 
-#include <GL/gl.h>
-#include <glm/vec3.hpp>
-#include <glm/vec4.hpp>
-
-using namespace std;
-using namespace glm;
-
-/**
- *  \struct Definition of a particle.
- */
-struct Particle 
+int main(int argc, char** argv)
 {
-	vec3 pos;			/**< Particle position. */
-	vec3 velocity;		/**< Particle velocity. */
-	vec4 color;			/**< Particle color.	*/
-	vec3 size;			/**< Particle size.		*/
-	float life;			/**< Particle life.		*/
-};
-
-#endif // __NUKE_PARTICLE__
+	testing::InitGoogleTest(&argc, argv);
+	return RUN_ALL_TESTS();
+}
