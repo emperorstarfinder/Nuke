@@ -23,6 +23,8 @@
 #include "Particles.hpp"
 #include <iostream>
 
+using namespace nuke::part;		// Particle namespace
+
 // Define a test class for the particles
 class ParticleTest : public ::testing::Test
 {

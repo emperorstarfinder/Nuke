@@ -1,5 +1,5 @@
 /*
- *  Particle class for Nuke.
+ *  Utilities for rendering class for Nuke.
  *
  *  Copyright (C) 2015 Rob Clucas robclu1818@gmail.com
  *
@@ -18,30 +18,13 @@
  *	Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#ifndef __NUKE_PARTICLE__
-#define __NUKE_PARTICLE__
-
-#include <GL/gl.h>
-#include <glm/vec3.hpp>
-#include <glm/vec4.hpp>
-
-using namespace std;
-using namespace glm;
+#ifndef __NUKE_RENDERER_UTIL__
+#define __NUKE_RENDERER_UTIL__
 
 namespace nuke {
-	namespace part {
-		/**
-		 *  \struct Definition of a particle.
-		 */
-		struct Particle 
-		{
-			vec3 pos;			/**< Particle position. */
-			vec3 velocity;		/**< Particle velocity. */
-			vec4 color;			/**< Particle color.	*/
-			vec3 size;			/**< Particle size.		*/
-			float life;			/**< Particle life.		*/
-		};
-	}	// End namespace part
+	namespace rend {
+	
+	}	// End namespace rend
 }		// End namespace nuke
 
-#endif // __NUKE_PARTICLE__
+#endif // __NUKE_RENDERER_UTIL__
