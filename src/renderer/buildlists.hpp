@@ -21,6 +21,9 @@
 
 #ifndef __NUKE_RENDERER_BUILDLISTS__
 #define __NUKE_RENDERER_BUILDLISTS__
+:q
+:
+:q
 
 #include <GL/gl.h>				// OpenGL
 #include <glm/vec3.hpp>			// 3D vectors
@@ -64,31 +67,31 @@ namespace nuke {
 			glVertex3f(-0.5f * X,  0.5f * Y,  0.5f * Z);	// Top Left Of The Texture and Quad
 			// Back Face
 			glTexCoord2f(1.0f, 0.0f); 
-			glVertex3f(-0.5f, -0.5f, -0.5f);	// Bottom Right Of The Texture and Quad
+			glVertex3f(-0.5f * X, -0.5f * Y, -0.5f * Z);	// Bottom Right Of The Texture and Quad
 			glTexCoord2f(1.0f, 1.0f); 
-			glVertex3f(-0.5f,  0.5f, -0.5f);	// Top Right Of The Texture and Quad
+			glVertex3f(-0.5f * X,  0.5f * Y, -0.5f * Z);	// Top Right Of The Texture and Quad
 			glTexCoord2f(0.0f, 1.0f); 
-			glVertex3f( 0.5f,  0.5f, -0.5f);	// Top Left Of The Texture and Quad
+			glVertex3f( 0.5f * X,  0.5f * Y, -0.5f * Z);	// Top Left Of The Texture and Quad
 			glTexCoord2f(0.0f, 0.0f); 
-			glVertex3f( 0.5f, -0.5f, -0.5f);	// Bottom Left Of The Texture and Quad
+			glVertex3f( 0.5f * X, -0.5f * Y, -0.5f * Z);	// Bottom Left Of The Texture and Quad
 			// Right face
 			glTexCoord2f(1.0f, 0.0f); 
-			glVertex3f( 0.5f, -0.5f, -0.5f);	// Bottom Right Of The Texture and Quad
+			glVertex3f( 0.5f * X, -0.5f * Y, -0.5f * Z);	// Bottom Right Of The Texture and Quad
 			glTexCoord2f(1.0f, 1.0f); 
-			glVertex3f( 0.5f,  0.5f, -0.5f);	// Top Right Of The Texture and Quad
+			glVertex3f( 0.5f * X,  0.5f * Y, -0.5f * Z);	// Top Right Of The Texture and Quad
 			glTexCoord2f(0.0f, 1.0f); 
-			glVertex3f( 0.5f,  0.5f,  0.5f);	// Top Left Of The Texture and Quad
+			glVertex3f( 0.5f * X,  0.5f * Y,  0.5f * Z);	// Top Left Of The Texture and Quad
 			glTexCoord2f(0.0f, 0.0f); 
-			glVertex3f( 0.5f, -0.5f,  0.5f);	// Bottom Left Of The Texture and Quad
+			glVertex3f( 0.5f * X, -0.5f * Y,  0.5f * Z);	// Bottom Left Of The Texture and Quad
 			// Left Face
 			glTexCoord2f(0.0f, 0.0f); 
-			glVertex3f(-0.5f, -0.5f, -0.5f);	// Bottom Left Of The Texture and Quad
+			glVertex3f(-0.5f * X, -0.5f * Y, -0.5f * Z);	// Bottom Left Of The Texture and Quad
 			glTexCoord2f(1.0f, 0.0f); 
-			glVertex3f(-0.5f, -0.5f,  0.5f);	// Bottom Right Of The Texture and Quad
+			glVertex3f(-0.5f * X, -0.5f * Y,  0.5f * Z);	// Bottom Right Of The Texture and Quad
 			glTexCoord2f(1.0f, 1.0f); 
-			glVertex3f(-0.5f,  0.5f,  0.5f);	// Top Right Of The Texture and Quad
+			glVertex3f(-0.5f * X,  0.5f * Y,  0.5f * Z);	// Top Right Of The Texture and Quad
 			glTexCoord2f(0.0f, 1.0f); 
-			glVertex3f(-0.5f,  0.5f, -0.5f);	// Top Left Of The Texture and Quad
+			glVertex3f(-0.5f * X,  0.5f * Y, -0.5f * Z);	// Top Left Of The Texture and Quad
 			// Top face
 			glTexCoord2f(0.0f, 1.0f); 
 			glVertex3f(-0.5f * X, 0.5f * Y, -0.5f * Z);	// Top Left Of The Texture and Quad
