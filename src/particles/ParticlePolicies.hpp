@@ -34,12 +34,14 @@
  * Simply create a new policy and add it to the template list when more
  * functionality is required.
  */
-template <class ParticleType, class LifePolicy, class ColorPolicy, class VelocityPolicy, class MovementPolicy>
+template <class ParticleType, class LifePolicy, class ColorPolicy,
+		  class SizePolicy, class VelocityPolicy, class MovementPolicy>
 class CompletePolicy
 {
 	public :
 		LifePolicy lifePolicy;				/**< Life policy for the particle.       */
 		ColorPolicy colorPolicy;			/**< Color policy for the particles.	 */
+		SizePolicy sizePolicy;				/**< Size policy for the particles.		 */
 		VelocityPolicy velocityPolicy;		/**< Velocity policy for the particles.  */
 		MovementPolicy movementPolicy;		/**< Movement policy for the particles.  */
 
@@ -47,6 +49,7 @@ class CompletePolicy
 		inline void PrepareAction() throw() {
 			lifePolicy.PrepareAction();
 			colorPolicy.PrepareAction();
+			sizePolicy.PrepareAction();
 			velocityPolicy.PrepareAction();
 			movementPolicy.PrepareAction();
 		}
@@ -59,6 +62,7 @@ class CompletePolicy
 		inline void operator() (ParticleType& particle) const throw() {
 			lifePolicy(particle);				// Give particle life
 			colorPolicy(particle);				// Give the particle color
+			sizePolicy(particle);				// Give the particle size
 			velocityPolicy(particle);			// Perform velocity related actions
 			movementPolicy(particle);			// Move the particle
 		}
@@ -145,6 +149,38 @@ class ColorInitializer
 		}
 };
 
+
+/** 
+ * \class Initializer policy class to be used to intialize the size of the
+ * particles.
+ */
+template <class ParticleType>
+class SizeInitializer
+{
+	public:
+		vec3 size;				/**< Size of the particle. */
+	public:
+		/** Construct the size initializer with a default 2D particle with unit
+		 * area. */
+		explicit SizeInitializer() throw() : size(vec3(1.f, 1.f, 0.f)) {}
+
+		/** Sets the size of a particle which is to be created.
+		 *
+		 * @param _size The size of the particle (3D)
+		 */
+		inline void SetSize(const vec3& _size) throw() {
+			size = _size;
+		}
+
+		/** Sets the particle's size to the size defined in the class.
+		 *
+		 * @param particle The particle for which the size will be set.
+		 */
+		inline void operator() (ParticleType& particle) const throw() {
+			particle.size = size;
+		}
+};
+
 /**
  * \class Initializer policy class used to initialize the velocity of a
  * group of particles.
@@ -223,11 +259,13 @@ class MoveAction
 };
 
 // Typedefs so that the rest of the program looks nice
-typedef CompletePolicy<Particle, LifeInitializer<Particle>, ColorInitializer<Particle>, VelocityInitializer<Particle>, 
-						NullPolicy<Particle> >
+typedef CompletePolicy<Particle, LifeInitializer<Particle>, ColorInitializer<Particle>, SizeInitializer<Particle>,
+						VelocityInitializer<Particle>, NullPolicy<Particle> >
 						ParticleInitializer;
+
+// Currently only actions for life and for movement
 typedef CompletePolicy<Particle, LifeAction<Particle>, NullPolicy<Particle>, NullPolicy<Particle>, 
-						MoveAction<Particle> >       
+						NullPolicy<Particle>, MoveAction<Particle> >       
 						ParticleAction;
 
 #endif // __NUKE_PARTICLE_POLICIES__

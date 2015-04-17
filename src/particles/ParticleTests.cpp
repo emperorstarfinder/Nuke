@@ -121,7 +121,7 @@ TEST_F(ParticleTest, ParticlesMoveCorrectlyForVelocityWithNoEffects)
 	}
 }
 
-TEST_F(ParticleTest, ColorCenBeSetCorrectly)
+TEST_F(ParticleTest, ColorIsInitializedCorrectly)
 {	
 	// Make 1000 particles active
 	ParticlesLarge.Emit(1000, vec3(0.0f, 0.0f, 0.0f));
@@ -151,6 +151,38 @@ TEST_F(ParticleTest, ParticlesCanChangeColor)
 		EXPECT_EQ(vec4(1.f, 0.f, 0.f, 0.f), testParticles[i].color);
 	}
 }
+
+TEST_F(ParticleTest, SizeIsInitializedCorrectly)
+{	
+	// Make 1000 particles active
+	ParticlesLarge.Emit(1000, vec3(0.0f, 0.0f, 0.0f));
+
+	// Get a pointer to the particles
+	const Particle* testParticles = ParticlesLarge.GetParticles();
+
+	// Check that they all have the correct size (2D particle with unit area)
+	for (size_t i = 0; i < 1000; i++) {
+		EXPECT_EQ(vec3(1.f, 1.f, 0.f), testParticles[i].size);
+	}
+}
+
+TEST_F(ParticleTest, ParticlesCanChangeSize)
+{
+	// Set the size of the particles to be 8u^3 cubes rather than 1u^2 squares
+	ParticlesMed.initializerPolicy.sizePolicy.SetSize(vec3(2.f, 2.f, 2.f));
+	
+	// Make them active at the origin
+	ParticlesMed.Emit(100, vec3(0.0f, 0.0f, 0.0f));
+
+	// Get a pointer to the particles
+	const Particle* testParticles = ParticlesMed.GetParticles();
+
+	// Check that the positions have been moved from the origin
+	for (size_t i = 0; i < 100; i++) {
+		EXPECT_EQ(vec3(2.f, 2.f, 2.f), testParticles[i].size);
+	}
+}
+
 int main(int argc, char** argv)
 {
 	testing::InitGoogleTest(&argc, argv);
