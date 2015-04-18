@@ -21,9 +21,7 @@
 
 #ifndef __NUKE_RENDERER_BUILDLISTS__
 #define __NUKE_RENDERER_BUILDLISTS__
-:q
-:
-:q
+
 
 #include <GL/gl.h>				// OpenGL
 #include <glm/vec3.hpp>			// 3D vectors
