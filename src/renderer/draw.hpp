@@ -35,9 +35,21 @@ namespace nuke {
 		// Clear the color and depth buffers
 		glClear(GL_COLOR_BUFFER_BIT, GL_DEPTH_BUFFER_BIT);
 
+		glLoadIdentity();											// Reset the view
+		glTranslatef(object.pos.x, object.pos.y, object.pos.z);		// Move to object location
+		glRotatef(obj.rot.x, 1.0f, 0.0f, 0.0f);						// Rotate about x-axis
+		glRotatef(obj.rot.y, 0.0f, 1.0f, 0.0f);						// Rotate about y-axis
+		glRotatef(obj.rot.z, 0.0f, 0.0f, 1.0f);						// Rotate about z-axis
+
 		// Now the texture to be used needs to be set. Each drawable objects
 		// should have a texture
 		// glBindTexture(X,Y)
+		
+		// Set the color of the object to draw
+		glColor4f(object.color.x, object.color.y, object.color.z, object.color.w);
+
+		// 
+		
 
 	}
 
