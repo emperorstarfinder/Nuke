@@ -22,7 +22,7 @@ TEST_EXE_NAME = nuke-lin-tests
 ###########################################
 
 BUILD_DIR 	= builds
-SRC_DIR		= src
+SRC_DIR		= src/prep
 TST_DIR 	= tests
 
 ###########################################

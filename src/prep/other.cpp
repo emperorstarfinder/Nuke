@@ -8,7 +8,7 @@
 
 using namespace nuke::rend;
 
-vec3 cubeSize(2.0f, 2.0f, 2.0f);
+vec3 cubeSize(1.0f, 1.0f, 1.0f);
 
 // Define ascii codes for the keyboard keys
 #define ESCAPE		27			// Macro for the escape key
