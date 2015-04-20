@@ -22,8 +22,8 @@
 #define __NUKE_TEXTURE__
 
 #include <sstream>
-#include <string>
 #include <iostream>
+#include <string.h>
 #include "textureutils.hpp"
 
 typedef unsigned long ulong;
@@ -58,7 +58,7 @@ namespace nuke {
 				 *			Size = Size in 3 digit format
 				 *			Type = The type of file
 				 */
-				Texture(const string filename) throw();
+				Texture(const char* filename) throw();
 
 				/** Descructor, frees memory on exit. */
 				~Texture() {
@@ -68,23 +68,42 @@ namespace nuke {
 					}
 				}
 
+				/** Returns the size of the texture's x dimension.
+				 *
+				 * @return The size of the x dimension of the texture.
+				 */
+				inline ulong SizeX() const { return sizeX; }
+
+				/** Returns the size of the texture's y dimension.
+				 *
+				 * @return The size of the y dimension (height) of the texture.
+				 */
+				inline ulong SizeY() const { return sizeY; }
+
+				/** Returns the texture data.
+				 *
+				 * @return A pointer to the texture data.
+				 */
+				inline char* Data() const { return data; }
+
 			private :
 				/** Function to load a texture from a bitmap.
 				 *
 				 * @param filename The name of the file to get the texture from.
 				 * @return If the texture was loaded from the bitmap.
 				 * */
-				bool loadBitmap(const string filename) throw();
+				bool loadBitmap(const char* filename) throw();
 		};
 
 		// Constructor when given the texture filename
-		Texture::Texture(const string file) throw() {
-	
-			string filetype = file.substr(file.find(".") + 1);			// Everything after the '.'
+		Texture::Texture(const char* file) throw() {
+		
+			const char* filetype = strchr(file, '.');		// Get .<filetype>
+			filetype++;										// Get rid of '.'
 
 			// Use the relevant function for the filetype (using the compile
 			// time hash of the string)
-			switch (strtoui(filetype.c_str())) {
+			switch (strtoui(filetype)) {
 				
 				// Bitmap file
 				case strtoui("bmp"):
@@ -102,7 +121,7 @@ namespace nuke {
 		// Function that loads a texture from a bitmap
 		// See here for more info on bitmaps :
 		// http://www.dcs.ed.ac.uk/~mxr/gfx/2d/BMP.txt 
-		bool Texture::loadBitmap(const string filename) throw() {
+		bool Texture::loadBitmap(const char* filename) throw() {
 			FILE *file;					// File handle
 			ulong size;					// Image size (in bytes)
 			ulong i;					// Counter
@@ -111,8 +130,8 @@ namespace nuke {
 			char temp;					// Temp col storage for bgr->rgb conversion
 	
 			// Make sure that the file exists
-			if ((file = fopen(filename.c_str(), "rb")) == NULL) {
-				cout << "File Not Found : " << filename << endl;
+			if ((file = fopen(filename, "rb")) == NULL) {
+				printf("File Not Found : %s\n", filename);
 				return 0;
 			}
 			
@@ -121,11 +140,11 @@ namespace nuke {
 
 			// Read the width
 			sizeX = getint (file);
-			cout << "Width of : " << filename << " : " <<  sizeX << endl;		// Testing
+			printf("Width of : %s : %lu\n", filename, sizeX);		// Testing
 			
 			// Read the height 
 			sizeY = getint (file);
-			cout << "Height of : " << filename << " : " <<  sizeY << endl;		// Testing
+			printf("Height of : %s : %lu\n", filename, sizeY);		// Testing
 
 			// Calculate the size (assuming 24 bits and 3 bytes per pixel
 			size = sizeX * sizeY * 3;
@@ -133,14 +152,14 @@ namespace nuke {
 			// Read the planes
 			planes = getshort(file);
 			if (planes != 1) {
-				cout << "ERROR T02 :Planes is not 1 : " << planes << endl;
+				printf("ERROR T02 :Planes is not 1 : %u\n", planes);
 				return 0;
 			}
 
 			// Read the bpp
 			bpp = getshort(file);
 			if (bpp != 24) {
-				cout << "ERROR T03 : Bpp from is not 24 : " << bpp << endl;
+				printf("ERROR T03 : Bpp from is not 24 : %u\n", bpp);
 				return 0;
 			}
 
@@ -150,12 +169,12 @@ namespace nuke {
 			// Read in the pixel data 
 			data = (char *)malloc(size);		// Allocate some space
 			if (data == NULL) {
-				cout << "ERROR T04 : Couldn't allocate the memory for texture data" << endl;
+				printf("ERROR T04 : Couldn't allocate the memory for texture data\n");
 				return 0;
 			}
 
 			if ((i = fread(data, size, 1, file)) != 1) {
-				cout << "ERROR T05 : Couldn't read texture data from " << filename << endl;
+				printf("ERROR T05 : Couldn't read texture data from %s\n", filename);
 				return 0;
 			}
 

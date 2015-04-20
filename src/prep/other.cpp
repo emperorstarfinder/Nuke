@@ -5,10 +5,12 @@
 #include <GL/gl.h>			// Header for the OpenGL32 library
 #include <GL/glut.h>		// Header for the GLu32 library
 #include "../renderer/buildlists.hpp"
+#include "../texture/texture.hpp"
 
 using namespace nuke::rend;
+using namespace nuke::tex;
 
-vec3 cubeSize(1.0f, 1.0f, 1.0f);
+vec3 cubeSize(2.0f, 2.0f, 2.0f);
 
 // Define ascii codes for the keyboard keys
 #define ESCAPE		27			// Macro for the escape key
@@ -51,88 +53,7 @@ typedef struct Image {
 	char *data;
 } Image;
 
-// Function for building a list
-GLvoid buildLists() 
-{
-	cube = glGenLists(2);			// 2 lists and return pointer to the first
-	glNewList(cube, GL_COMPILE);	// Store the lists at cueb (location) and compile
-
-	// Cube without the top
-	glBegin(GL_QUADS);	
-	
-	// Bottom face
-    glTexCoord2f(1.0f, 1.0f); 
-    glVertex3f(-1.0f, -1.0f, -1.0f);	// Top Right Of The Texture and Quad
-    glTexCoord2f(0.0f, 1.0f); 
-    glVertex3f( 1.0f, -1.0f, -1.0f);	// Top Left Of The Texture and Quad
-    glTexCoord2f(0.0f, 0.0f); 
-    glVertex3f( 1.0f, -1.0f,  1.0f);	// Bottom Left Of The Texture and Quad
-    glTexCoord2f(1.0f, 0.0f); 
-    glVertex3f(-1.0f, -1.0f,  1.0f);	// Bottom Right Of The Texture and Quad
-    
-    // Front Face
-    glTexCoord2f(0.0f, 0.0f); 
-    glVertex3f(-1.0f, -1.0f,  1.0f);	// Bottom Left Of The Texture and Quad
-    glTexCoord2f(1.0f, 0.0f); 
-    glVertex3f( 1.0f, -1.0f,  1.0f);	// Bottom Right Of The Texture and Quad
-    glTexCoord2f(1.0f, 1.0f); 
-    glVertex3f( 1.0f,  1.0f,  1.0f);	// Top Right Of The Texture and Quad
-    glTexCoord2f(0.0f, 1.0f); 
-    glVertex3f(-1.0f,  1.0f,  1.0f);	// Top Left Of The Texture and Quad
-    
-    // Back Face
-    glTexCoord2f(1.0f, 0.0f); 
-    glVertex3f(-1.0f, -1.0f, -1.0f);	// Bottom Right Of The Texture and Quad
-    glTexCoord2f(1.0f, 1.0f); 
-    glVertex3f(-1.0f,  1.0f, -1.0f);	// Top Right Of The Texture and Quad
-    glTexCoord2f(0.0f, 1.0f); 
-    glVertex3f( 1.0f,  1.0f, -1.0f);	// Top Left Of The Texture and Quad
-    glTexCoord2f(0.0f, 0.0f); 
-    glVertex3f( 1.0f, -1.0f, -1.0f);	// Bottom Left Of The Texture and Quad
-    
-    // Right face
-    glTexCoord2f(1.0f, 0.0f); 
-    glVertex3f( 1.0f, -1.0f, -1.0f);	// Bottom Right Of The Texture and Quad
-    glTexCoord2f(1.0f, 1.0f); 
-    glVertex3f( 1.0f,  1.0f, -1.0f);	// Top Right Of The Texture and Quad
-    glTexCoord2f(0.0f, 1.0f); 
-    glVertex3f( 1.0f,  1.0f,  1.0f);	// Top Left Of The Texture and Quad
-    glTexCoord2f(0.0f, 0.0f); 
-    glVertex3f( 1.0f, -1.0f,  1.0f);	// Bottom Left Of The Texture and Quad
-    
-    // Left Face
-    glTexCoord2f(0.0f, 0.0f); 
-    glVertex3f(-1.0f, -1.0f, -1.0f);	// Bottom Left Of The Texture and Quad
-    glTexCoord2f(1.0f, 0.0f); 
-    glVertex3f(-1.0f, -1.0f,  1.0f);	// Bottom Right Of The Texture and Quad
-    glTexCoord2f(1.0f, 1.0f); 
-    glVertex3f(-1.0f,  1.0f,  1.0f);	// Top Right Of The Texture and Quad
-    glTexCoord2f(0.0f, 1.0f); 
-    glVertex3f(-1.0f,  1.0f, -1.0f);	// Top Left Of The Texture and Quad
-
-	glEnd();
-	glEndList();
-
-	// Move the to the mem location of the second list
-	top = cube + 1;
-	glNewList(top, GL_COMPILE);			// Generate the second list 
-
-	glBegin(GL_QUADS);	
-
-	// Top face
-	glTexCoord2f(0.0f, 1.0f); 
-    glVertex3f(-1.0f,  1.0f, -1.0f);	// Top Left Of The Texture and Quad
-    glTexCoord2f(0.0f, 0.0f); 
-    glVertex3f(-1.0f,  1.0f,  1.0f);	// Bottom Left Of The Texture and Quad
-    glTexCoord2f(1.0f, 0.0f); 
-    glVertex3f( 1.0f,  1.0f,  1.0f);	// Bottom Right Of The Texture and Quad
-    glTexCoord2f(1.0f, 1.0f); 
-    glVertex3f( 1.0f,  1.0f, -1.0f);	// Top Right Of The Texture and Quad
-		
-	glEnd();
-	glEndList();
-}
-
+/*
 // Other bitmap loader not working
 static unsigned int getint(FILE *fp)
 {
@@ -234,24 +155,11 @@ int loadImage(const char * filename, Image * image)
 	// Success =D
 	return 1;
 }
-
+*/
 // Load the bitmaps and convert them to textures
 void loadGlTextures()
 {
-	Image *image1;											// Load a texture
-
-	// Allocate memory for the texture
-	image1 = (Image *)malloc(sizeof(Image));
-	if (image1 == NULL) {
-		printf("Error allocating space for the image\n");
-		exit(0);											// Quit
-	}
-	
-	const char * textureFile = "textures/Cube.bmp";		// Declare the filename
-
-	if (!loadImage(textureFile, image1)) {
-		exit(1);
-	}
+	Texture image1("textures/Cube.bmp");
 
 	glGenTextures(1, &texture[0]);							// Create the texture
 	glBindTexture(GL_TEXTURE_2D, texture[0]);				// 2D texture (x, y)
@@ -262,7 +170,7 @@ void loadGlTextures()
 	// Params are:
 	//	[2d tex  ,  detail level     ,  num components, img x size, img y size, border,
 	//	 col data, unsigned byte data, data itself]
-    gluBuild2DMipmaps(GL_TEXTURE_2D, 3, image1->sizeX, image1->sizeY, GL_RGB, GL_UNSIGNED_BYTE, image1->data);
+    gluBuild2DMipmaps(GL_TEXTURE_2D, 3, image1.SizeX(), image1.SizeY(), GL_RGB, GL_UNSIGNED_BYTE, image1.Data());
 }
 
 // General OpenGL init. Sets all initial params

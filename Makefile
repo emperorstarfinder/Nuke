@@ -78,7 +78,7 @@ LIB_DIRS 	= /usr/lib
 
 CXX 		= g++
 WXX			= x86_64-w64-mingw32-g++
-CXX_FLAGS 	= -g -O3
+CXX_FLAGS 	= -g -O3 -std=c++11
 WXX_FLAGS   =
 
 .PHONY: all nuke nuketests
