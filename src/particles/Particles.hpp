@@ -24,6 +24,8 @@
 #include "ParticlePolicies.hpp"
 #include "../texture/textures.hpp"
 
+using namespace nuke::tex;		// For Textures class
+
 namespace nuke {
 	namespace part {
 		/** 
