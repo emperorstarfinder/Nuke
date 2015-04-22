@@ -21,7 +21,7 @@
 #ifndef __NUKE_TEXTURES__
 #define __NUKE_TEXTURES__
 
-#include <GL/gl.h>				// GLunit
+#include <GL/gl.h>				// GLuint
 #include <vector>				// Dynamic allocation of textures
 #include <initializer_list>		// For list construction
 #include "texture.hpp"			// For a single texture
@@ -36,15 +36,22 @@ namespace nuke {
 			private :
 				vector<Texture>	textureInfo;	/**< Container for nuke textures which store the 
 													 information to bind to the OpenGL textures. */
-				uint numBoundTextures.			/**< The number of textures that have been bound. */
+				uint numBoundTextures;			/**< The number of textures that have been bound. */
 			public :
+				/** Default constructor. */
+				explicit Textures() throw() : textures(0), textureInfo(0) {}
+
 				/** Constructor for creating Textures by proving a  list of the
 				 * textures to load. 
 				 *
 				 * @param _textureNames The names of the textures to load. 
 				 */
-				explicit Textures(initializer_list<const char*> texNames) throw() : textures(texNames.size()),textureInfo(texNames) {
-					// Initialize (bind) each GLunit texture in textures to the
+				explicit Textures(initializer_list<const char*> texNames) throw() : textures(texNames.size()) {
+					for (auto& texName : texNames) {
+						textureInfo.emplace_back(texName);		// Create a new nuke::tex::Texture which holds texture info
+					}
+
+					// Initialize (bind) each GLuint texture in textures to the
 					// information in the textureInfo corresponding to it
 					// (indexes of the containers relate)
 					initializeTextures(texNames.size());		
@@ -55,9 +62,9 @@ namespace nuke {
 				 * @param newTexNames The names of the new textures to add.
 				 */
 				void append(initializer_list<const char*> newTexNames) throw() {
-					textureInfo.insert(textureInfo.end(), newTexNames.begin(), newTexNames.end());		// Add new textures
-					for (size_t i = 0; i < newTexNames.size(); i++) {									// Add them to the texturs container
-						textures.push_back(GLunit(0));					
+					for (auto& texName : newTexNames) {				
+						textureInfo.emplace_back(texName);			// Add new texture info
+						textures.push_back(GLuint(0));				// Add new texture
 					}
 
 					// Containers now have the necessary elements, now initalize
@@ -70,7 +77,7 @@ namespace nuke {
 				 *
 				 * @param numToGenerate The number of textures to generate.
 				 */
-				void initializeTextures(unit numToGenerate) throw() {
+				void initializeTextures(uint numToGenerate) throw() {
 					// Generate numToGenerateTextures staeting at the end of the
 					// already bound textures
 					glGenTextures(numToGenerate, &textures[numBoundTextures]);
@@ -87,7 +94,7 @@ namespace nuke {
 				 * @param index The index of the texture in the texture
 				 * container to bind.
 				 */
-				void bindTexture(unit index) throw() {
+				void bindTexture(uint index) throw() {
 					glBindTexture(GL_TEXTURE_2D, textures[index]);		// Bind 2D texture
 
 					// Currently only linear filtering, will add options for
@@ -98,7 +105,7 @@ namespace nuke {
 					// Parameters :
 					//		[2D Texture, Detail Level, Num Components, Tex X size, 
 					//		 Tex Y size, Border		 , Color Data	 , Unsigned Byte Data, Texture Data]	
-					glTeximage2D(GL_TEXTURE_2D, 0, 3, textureInfo[index].SizeX(), textureInfo.SizeY(), 0, GL_RGB, GL_UNSIGNED_BYTE, textureInfo[index].Data());
+					glTexImage2D(GL_TEXTURE_2D, 0, 3, textureInfo[index].SizeX(), textureInfo[index].SizeY(), 0, GL_RGB, GL_UNSIGNED_BYTE, textureInfo[index].Data());
 			}
 		};
 	}		// End namespace tex

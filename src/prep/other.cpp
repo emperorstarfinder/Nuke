@@ -5,7 +5,7 @@
 #include <GL/gl.h>			// Header for the OpenGL32 library
 #include <GL/glut.h>		// Header for the GLu32 library
 #include "../renderer/buildlists.hpp"
-#include "../texture/texture.hpp"
+#include "../texture/textures.hpp"
 
 using namespace nuke::rend;
 using namespace nuke::tex;
@@ -28,7 +28,8 @@ int fp;						// If 'F' is pressed
 
 GLfloat rotX, rotY, rotZ;			// Angles and speeds of rotation
 GLfloat z = -5.0f;					// Depth into the screen
-GLuint texture[1];					// Storage for 1 texture
+//GLuint texture[1];					// Storage for 1 texture
+Textures textureArray;
 GLuint blend;						// Turn the blending on or off
 
 GLuint cube;						// Storage for the display list
@@ -53,6 +54,7 @@ typedef struct Image {
 	char *data;
 } Image;
 
+/*
 // Load the bitmaps and convert them to textures
 void loadGlTextures()
 {
@@ -71,11 +73,12 @@ void loadGlTextures()
 	//	 col data, unsigned byte data, data itself]
     gluBuild2DMipmaps(GL_TEXTURE_2D, 3, image1.SizeX(), image1.SizeY(), GL_RGB, GL_UNSIGNED_BYTE, image1.Data());
 }
-
+*/
 // General OpenGL init. Sets all initial params
 void initGL(int width, int height)
 {
-	loadGlTextures();							// Load the textures
+	//loadGlTextures();							// Load the textures
+	textureArray.append({"textures/Cube.bmp"});
 	BuildCubeList(cubeSize, &cube);				//
 	glEnable(GL_TEXTURE_2D);					// Enable texture mapping
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);		// Black background
@@ -120,7 +123,7 @@ void drawGlScene()
 	// Clear the color and the depth buffers 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);	
 	
-	glBindTexture(GL_TEXTURE_2D, texture[0]);
+	glBindTexture(GL_TEXTURE_2D, textureArray.textures[0]);
 
 	// Make a pyramid like structure from cubes
 	for (yloop = 1; yloop < 6; yloop++) {
