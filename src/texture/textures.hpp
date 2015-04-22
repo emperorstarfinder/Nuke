@@ -38,38 +38,27 @@ namespace nuke {
 													 information to bind to the OpenGL textures. */
 				uint numBoundTextures;			/**< The number of textures that have been bound. */
 			public :
-				/** Default constructor. */
+				/** Default constructor. By design this constructor does not
+				 * bind and initialize textures so that there is more control
+				 * for when the textures are bound, using the append function
+				 * below. This allows textures to be created during
+				 * initialization and then bound when appropriate. */
 				explicit Textures() throw() : textures(0), textureInfo(0) {}
 
-				/** Constructor for creating Textures by proving a  list of the
-				 * textures to load. 
-				 *
-				 * @param _textureNames The names of the textures to load. 
-				 */
-				explicit Textures(initializer_list<const char*> texNames) throw() : textures(texNames.size()) {
-					for (auto& texName : texNames) {
-						textureInfo.emplace_back(texName);		// Create a new nuke::tex::Texture which holds texture info
-					}
-
-					// Initialize (bind) each GLuint texture in textures to the
-					// information in the textureInfo corresponding to it
-					// (indexes of the containers relate)
-					initializeTextures(texNames.size());		
-				}
-
-				/** Append textures to the list.
+				/** Append textures to the textures list, and then bind them to
+				 * OpenGL using the textureInfo.
 				 *
 				 * @param newTexNames The names of the new textures to add.
 				 */
-				void append(initializer_list<const char*> newTexNames) throw() {
-					for (auto& texName : newTexNames) {				
+				void append(initializer_list<const char*> texNames) throw() {
+					for (auto& texName : texNames) {				
 						textureInfo.emplace_back(texName);			// Add new texture info
 						textures.push_back(GLuint(0));				// Add new texture
 					}
 
 					// Containers now have the necessary elements, now initalize
-					// the GL textures by binding to the textureInfo
-					initializeTextures(newTexNames.size());												
+					// the GL textures by binding using the textureInfo
+					initializeTextures(texNames.size());												
 				}
 			private :
 				/** Function to bind the textures to the to the OpenGL context
@@ -78,7 +67,7 @@ namespace nuke {
 				 * @param numToGenerate The number of textures to generate.
 				 */
 				void initializeTextures(uint numToGenerate) throw() {
-					// Generate numToGenerateTextures staeting at the end of the
+					// Generate numToGenerateTextures starting at the end of the
 					// already bound textures
 					glGenTextures(numToGenerate, &textures[numBoundTextures]);
 

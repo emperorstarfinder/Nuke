@@ -185,6 +185,37 @@ TEST_F(ParticleTest, ParticlesCanChangeSize)
 	}
 }
 
+TEST_F(ParticleTest, TextureIsInitializedCorrectly)
+{	
+	// Make 1000 particles active
+	ParticlesLarge.Emit(1000, vec3(0.0f, 0.0f, 0.0f));
+
+	// Get a pointer to the particles
+	const Particle* testParticles = ParticlesLarge.GetParticles();
+
+	// Check that they all have the correct size (2D particle with unit area)
+	for (size_t i = 0; i < 1000; i++) {
+		EXPECT_EQ(0, testParticles[i].texture);	// No set texture so should be default
+	}
+}
+
+TEST_F(ParticleTest, ParticleTextureIndexCanChange)
+{
+	// Set the size of the particles to be 8u^3 cubes rather than 1u^2 squares
+	ParticlesMed.initializerPolicy.texturePolicy.SetTexture(1);
+	
+	// Make them active at the origin
+	ParticlesMed.Emit(100, vec3(0.0f, 0.0f, 0.0f));
+
+	// Get a pointer to the particles
+	const Particle* testParticles = ParticlesMed.GetParticles();
+
+	// Check that the positions have been moved from the origin
+	for (size_t i = 0; i < 100; i++) {
+		EXPECT_EQ(1, testParticles[i].texture);
+	}
+}
+				
 int main(int argc, char** argv)
 {
 	testing::InitGoogleTest(&argc, argv);

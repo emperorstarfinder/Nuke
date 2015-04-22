@@ -42,7 +42,7 @@ namespace nuke {
 			vec4 color;			/**< Particle color.	*/
 			vec3 size;			/**< Particle size.		*/
 			float life;			/**< Particle life.		*/
-			Texture* texture;	/**< Particle texture.	*/
+			uint texture;	    /**< Particle texture index in particles textures vector. */
 		};
 	}	// End namespace part
 }		// End namespace nuke

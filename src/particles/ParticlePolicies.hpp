@@ -37,13 +37,14 @@ namespace nuke {
 		 * functionality is required.
 		 */
 		template <class ParticleType, class LifePolicy, class ColorPolicy,
-				  class SizePolicy, class VelocityPolicy, class MovementPolicy>
+				  class SizePolicy, class TexturePolicy, class VelocityPolicy, class MovementPolicy>
 		class CompletePolicy
 		{
 			public :
 				LifePolicy lifePolicy;				/**< Life policy for the particle.       */
 				ColorPolicy colorPolicy;			/**< Color policy for the particles.	 */
 				SizePolicy sizePolicy;				/**< Size policy for the particles.		 */
+				TexturePolicy texturePolicy;		/**< Texture policy for the particle.	 */
 				VelocityPolicy velocityPolicy;		/**< Velocity policy for the particles.  */
 				MovementPolicy movementPolicy;		/**< Movement policy for the particles.  */
 
@@ -52,6 +53,7 @@ namespace nuke {
 					lifePolicy.PrepareAction();
 					colorPolicy.PrepareAction();
 					sizePolicy.PrepareAction();
+					texturePolicy.PrepareAction();
 					velocityPolicy.PrepareAction();
 					movementPolicy.PrepareAction();
 				}
@@ -65,6 +67,7 @@ namespace nuke {
 					lifePolicy(particle);				// Give particle life
 					colorPolicy(particle);				// Give the particle color
 					sizePolicy(particle);				// Give the particle size
+					texturePolicy(particle);			// Give the particle a texture to use
 					velocityPolicy(particle);			// Perform velocity related actions
 					movementPolicy(particle);			// Move the particle
 				}
@@ -183,6 +186,38 @@ namespace nuke {
 				}
 		};
 
+		/** 
+		 * \class Initializer policy class used to initialize the textures for a
+		 * group of particles.
+		 */
+		template <class ParticleType>
+		class TextureInitializer
+		{
+			public:
+				unsigned int texture;	/**< Index of texure to use in particles textures vector. */
+			public:
+				/** Construct the texture initializer to use the default
+				 * (first) texture. */
+				explicit TextureInitializer() throw() : texture(0) {}
+
+				/** Sets the index of the texture to use when drawing particles
+				 * to the screen.
+				 *
+				 * @param index The index for the texture in the particles
+				 * textures vector.
+				 */
+				inline void SetTexture(const unsigned int index) throw() {
+					texture = index;
+				}
+
+				/** Sets the texture to use as the default (first) texture of
+				 * the textures stored for the particle group.
+				 * */
+				inline void operator() (ParticleType& particle) const throw() {
+					particle.texture = texture;
+				}
+		};
+
 		/**
 		 * \class Initializer policy class used to initialize the velocity of a
 		 * group of particles.
@@ -262,12 +297,12 @@ namespace nuke {
 
 		// Typedefs so that the rest of the program looks nice
 		typedef CompletePolicy<Particle, LifeInitializer<Particle>, ColorInitializer<Particle>, SizeInitializer<Particle>,
-								VelocityInitializer<Particle>, NullPolicy<Particle> >
+								TextureInitializer<Particle>, VelocityInitializer<Particle>, NullPolicy<Particle> >
 								ParticleInitializer;
 
 		// Currently only actions for life and for movement
 		typedef CompletePolicy<Particle, LifeAction<Particle>, NullPolicy<Particle>, NullPolicy<Particle>, 
-								NullPolicy<Particle>, MoveAction<Particle> >       
+								NullPolicy<Particle>, NullPolicy<Particle>, MoveAction<Particle> >       
 								ParticleAction;
 	}	// End namespace nuke
 }		// End namespace part

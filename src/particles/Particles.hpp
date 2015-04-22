@@ -22,6 +22,7 @@
 #define __NUKE_PARTICLES__
 
 #include "ParticlePolicies.hpp"
+#include "../texture/textures.hpp"
 
 namespace nuke {
 	namespace part {
@@ -61,6 +62,15 @@ namespace nuke {
 						return 0;
 					}
 					return particleArray;
+				}
+
+				/** Binds textures to OpenGL context which are supplied as
+				 * arguments.
+				 *
+				 * @param texNames The names of the texture to bind.
+				 */
+				inline void BindTextures(initializer_list<const char*> texNames) throw() {
+					textures.append(texNames);
 				}
 
 				/** Emit a certain number of particles at a certain position. 
@@ -110,6 +120,9 @@ namespace nuke {
 
 				/** Array of size particles of ParticleType which make up the system. */
 				ParticleType particleArray[size];
+
+				/** Textures that are used by the group of particles. */
+				Textures textures;
 		};
 	}
 }
