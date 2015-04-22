@@ -24,9 +24,11 @@
 #include <GL/gl.h>
 #include <glm/vec3.hpp>
 #include <glm/vec4.hpp>
+#include "../texture/texture.hpp"
 
 using namespace std;
-using namespace glm;
+using namespace glm;			// For vectors
+using namespace nuke::tex;		// For texture
 
 namespace nuke {
 	namespace part {
@@ -40,6 +42,7 @@ namespace nuke {
 			vec4 color;			/**< Particle color.	*/
 			vec3 size;			/**< Particle size.		*/
 			float life;			/**< Particle life.		*/
+			Texture* texture;	/**< Particle texture.	*/
 		};
 	}	// End namespace part
 }		// End namespace nuke

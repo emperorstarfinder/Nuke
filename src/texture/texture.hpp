@@ -48,6 +48,10 @@ namespace nuke {
 				char* data;			/**< The texture data. */
 			
 			public :
+				/** Default constructor for a texture that creates an empty
+				 * texture. */
+				explicit Texture() throw() : sizeX(0), sizeY(0), data(NULL) {}
+
 				/** Load a texture from a file.
 				 *
 				 * @param filename The name of the file from which the texture must be loaded in
@@ -58,10 +62,10 @@ namespace nuke {
 				 *			Size = Size in 3 digit format
 				 *			Type = The type of file
 				 */
-				Texture(const char* filename) throw();
+				explicit Texture(const char* filename) throw();
 
 				/** Descructor, frees memory on exit. */
-				~Texture() {
+				~Texture() throw() {
 					if (data != NULL) {
 						free(data);
 						data = NULL;

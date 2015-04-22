@@ -58,6 +58,8 @@ void loadGlTextures()
 {
 	Texture image1("textures/Cube.bmp");
 
+	printf("Size of texture is : %zu", sizeof image1);
+
 	glGenTextures(1, &texture[0]);							// Create the texture
 	glBindTexture(GL_TEXTURE_2D, texture[0]);				// 2D texture (x, y)
 
