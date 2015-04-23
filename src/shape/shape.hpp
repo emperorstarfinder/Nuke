@@ -48,6 +48,9 @@ namespace nuke {
 				DrawableShape type;		/**< Name of the shape. */
 				vec3 size;				/**< Size of the shape.	*/
 			public:
+				/** Default constructor. */
+				Shape() throw() : type(DrawableShape::CUBE), size(vec3(1.0f, 1.0f, 1.0f)) {}
+
 				/** Constructor for the shape class.
 				 *
 				 * @param _type The type of the shape.
@@ -55,8 +58,22 @@ namespace nuke {
 				 */
 				explicit Shape(DrawableShape _type, vec3 _size) throw() : type(_type), size(_size) {}
 
+				/** Equality operator.
+				 *
+				 * @param shape The shape with which equality must be checked.
+				 * @return If the shapes are equal.
+				 */
 				inline bool operator== (const Shape& shape) const throw() {
 					return ((shape.type == type) && (vec3equal(shape.size, size)));
+				}
+
+				/** Assignment operator.
+				 *
+				 * @param shape The shape with which to make the shape equal to.
+				 */
+				inline void operator= (const Shape& shape) throw() {
+					type = shape.type;
+					size = shape.size;
 				}
 		};
 

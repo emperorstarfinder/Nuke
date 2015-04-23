@@ -22,13 +22,14 @@
 #define __NUKE_PARTICLE__
 
 #include <GL/gl.h>
-#include <glm/vec3.hpp>
-#include <glm/vec4.hpp>
+#include "../shape/shape.hpp"
 #include "../texture/texture.hpp"
 
 using namespace std;
 using namespace glm;			// For vectors
 using namespace nuke::tex;		// For texture
+using namespace nuke::shape;	// For shapes
+
 
 namespace nuke {
 	namespace part {
@@ -40,9 +41,9 @@ namespace nuke {
 			vec3 pos;			/**< Particle position. */
 			vec3 velocity;		/**< Particle velocity. */
 			vec4 color;			/**< Particle color.	*/
-			vec3 size;			/**< Particle size.		*/
 			float life;			/**< Particle life.		*/
 			uint texture;	    /**< Particle texture index in particles textures vector. */
+			Shape shape;		/**< Particle shape, which requires a shape type and size. */
 		};
 	}	// End namespace part
 }		// End namespace nuke

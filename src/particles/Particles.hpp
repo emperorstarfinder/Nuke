@@ -23,7 +23,7 @@
 
 #include "ParticlePolicies.hpp"
 #include "../texture/textures.hpp"
-#include "../rederer/buildlists.hpp"		// For creating build lists
+#include "../renderer/buildlists.hpp"		// For creating build lists
 #include "../shape/shape.hpp"				// For Shape class
 
 using namespace nuke::tex;		    // For Textures class
@@ -136,7 +136,7 @@ namespace nuke {
 
 								// Now build a list for that shape
 								BuildList(particleArray[part].shape.size, &shapes[particleArray[part].shape]);
-								}
+						}
 					}
 				}
 
@@ -153,6 +153,7 @@ namespace nuke {
 						glColor4fv(particleArray[part].color);					// Set the color of the particle
 						glCallList(shapes[particleArray[part].shape]);			// Get and draw the shape
 					}
+				}
 					
 			private:
 				/** The number of currently active particles in the sytem. */
@@ -168,7 +169,7 @@ namespace nuke {
 				 * we only need to compile a buildlist each time a particle has
 				 * a different shape.
 				 */
-				unordered_map<Shape, Gluint, ShapeHash> shapes;
+				unordered_map<Shape, GLuint, ShapeHash> shapes;
 		};
 	}
 }

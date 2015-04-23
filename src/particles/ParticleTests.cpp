@@ -154,7 +154,7 @@ TEST_F(ParticleTest, ParticlesCanChangeColor)
 	}
 }
 
-TEST_F(ParticleTest, SizeIsInitializedCorrectly)
+TEST_F(ParticleTest, ShapeIsInitializedCorrectly)
 {	
 	// Make 1000 particles active
 	ParticlesLarge.Emit(1000, vec3(0.0f, 0.0f, 0.0f));
@@ -162,16 +162,16 @@ TEST_F(ParticleTest, SizeIsInitializedCorrectly)
 	// Get a pointer to the particles
 	const Particle* testParticles = ParticlesLarge.GetParticles();
 
-	// Check that they all have the correct size (2D particle with unit area)
+	// Check that they all have the correct size (3D particle with unit area)
 	for (size_t i = 0; i < 1000; i++) {
-		EXPECT_EQ(vec3(1.f, 1.f, 0.f), testParticles[i].size);
+		EXPECT_EQ(vec3(1.f, 1.f, 1.f), testParticles[i].shape.size);
 	}
 }
 
 TEST_F(ParticleTest, ParticlesCanChangeSize)
 {
 	// Set the size of the particles to be 8u^3 cubes rather than 1u^2 squares
-	ParticlesMed.initializerPolicy.sizePolicy.SetSize(vec3(2.f, 2.f, 2.f));
+	ParticlesMed.initializerPolicy.shapePolicy.SetSize(vec3(2.f, 2.f, 2.f));
 	
 	// Make them active at the origin
 	ParticlesMed.Emit(100, vec3(0.0f, 0.0f, 0.0f));
@@ -181,7 +181,7 @@ TEST_F(ParticleTest, ParticlesCanChangeSize)
 
 	// Check that the positions have been moved from the origin
 	for (size_t i = 0; i < 100; i++) {
-		EXPECT_EQ(vec3(2.f, 2.f, 2.f), testParticles[i].size);
+		EXPECT_EQ(vec3(2.f, 2.f, 2.f), testParticles[i].shape.size);
 	}
 }
 

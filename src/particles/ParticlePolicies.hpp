@@ -37,13 +37,13 @@ namespace nuke {
 		 * functionality is required.
 		 */
 		template <class ParticleType, class LifePolicy, class ColorPolicy,
-				  class SizePolicy, class TexturePolicy, class VelocityPolicy, class MovementPolicy>
+				  class ShapePolicy, class TexturePolicy, class VelocityPolicy, class MovementPolicy>
 		class CompletePolicy
 		{
 			public :
 				LifePolicy lifePolicy;				/**< Life policy for the particle.       */
 				ColorPolicy colorPolicy;			/**< Color policy for the particles.	 */
-				SizePolicy sizePolicy;				/**< Size policy for the particles.		 */
+				ShapePolicy shapePolicy;			/**< Size policy for the particles.		 */
 				TexturePolicy texturePolicy;		/**< Texture policy for the particle.	 */
 				VelocityPolicy velocityPolicy;		/**< Velocity policy for the particles.  */
 				MovementPolicy movementPolicy;		/**< Movement policy for the particles.  */
@@ -52,7 +52,7 @@ namespace nuke {
 				inline void PrepareAction() throw() {
 					lifePolicy.PrepareAction();
 					colorPolicy.PrepareAction();
-					sizePolicy.PrepareAction();
+					shapePolicy.PrepareAction();
 					texturePolicy.PrepareAction();
 					velocityPolicy.PrepareAction();
 					movementPolicy.PrepareAction();
@@ -66,7 +66,7 @@ namespace nuke {
 				inline void operator() (ParticleType& particle) const throw() {
 					lifePolicy(particle);				// Give particle life
 					colorPolicy(particle);				// Give the particle color
-					sizePolicy(particle);				// Give the particle size
+					shapePolicy(particle);				// Give the particle size
 					texturePolicy(particle);			// Give the particle a texture to use
 					velocityPolicy(particle);			// Perform velocity related actions
 					movementPolicy(particle);			// Move the particle
@@ -187,6 +187,47 @@ namespace nuke {
 		};
 
 		/** 
+		 * \class Initializer policy class to be used to intialize the shape of the
+		 * particles.
+		 */
+		template <class ParticleType>
+		class ShapeInitializer
+		{
+			public:
+				vec3 size;				/**< Size of the particle. */
+				DrawableShape type;		/**< Type of shape for the particle. */
+			public:
+				/** Construct the size initializer with a default 3D particle with unit
+				 * area. */
+				explicit ShapeInitializer() throw() : type(DrawableShape::CUBE), size(vec3(1.f, 1.f, 1.f)) {}
+
+				/** Sets the size of a particle which is to be created.
+				 *
+				 * @param _size The size of the particle (3D)
+				 */
+				inline void SetSize(const vec3& _size) throw() {
+					size = _size;
+				}
+
+				/** Sets the type of shape the particle will be.
+				 *
+				 * @param _type The type of shape for the particle.
+				 */
+				inline void SetType(const DrawableShape& _type) throw() {
+					type = _type;
+				}
+
+				/** Sets the particle's size to the size defined in the class.
+				 *
+				 * @param particle The particle for which the size will be set.
+				 */
+				inline void operator() (ParticleType& particle) const throw() {
+					particle.shape = Shape(type, size);
+				}
+		};
+	
+
+		/** 
 		 * \class Initializer policy class used to initialize the textures for a
 		 * group of particles.
 		 */
@@ -296,7 +337,7 @@ namespace nuke {
 		};
 
 		// Typedefs so that the rest of the program looks nice
-		typedef CompletePolicy<Particle, LifeInitializer<Particle>, ColorInitializer<Particle>, SizeInitializer<Particle>,
+		typedef CompletePolicy<Particle, LifeInitializer<Particle>, ColorInitializer<Particle>, ShapeInitializer<Particle>,
 								TextureInitializer<Particle>, VelocityInitializer<Particle>, NullPolicy<Particle> >
 								ParticleInitializer;
 
