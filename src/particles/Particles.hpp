@@ -21,12 +21,14 @@
 #ifndef __NUKE_PARTICLES__
 #define __NUKE_PARTICLES__
 
-#include <unordered_map>					// For storing buildlists
 #include "ParticlePolicies.hpp"
 #include "../texture/textures.hpp"
 #include "../rederer/buildlists.hpp"		// For creating build lists
+#include "../shape/shape.hpp"				// For Shape class
 
-using namespace nuke::tex;		// For Textures class
+using namespace nuke::tex;		    // For Textures class
+using namespace nuke::shape;		// For Shape and ShapeHash
+using namespace nuke::rend;			// For BuildList
 
 namespace nuke {
 	namespace part {
@@ -37,7 +39,7 @@ namespace nuke {
 		template<size_t size, class ParticleType, class InitializerPolicy, class ActionPolicy>
 		class Particles
 		{
-			public :
+			public:
 				/** Initializer policy used to initalize new particles. */
 				InitializerPolicy initializerPolicy;
 
@@ -119,6 +121,25 @@ namespace nuke {
 					}
 				}
 
+				/** Compiles buildlists for the shapes that the partices need. 
+				 * This should be done before the main loop execution to take
+				 * advantage of the rendering speed it will result in.
+				 */
+				void BuildShapes() throw() {
+					// For each active particle
+					for (size_t part = 0; part < activeCount; part++) {
+						// Check to see if a build list has been compiled for this shape
+						if (shapes.find(particleArray[part].shape) == shapes.end()) {
+								// If not found hen we need to add this shape 
+								// (GLuint) with the key as the particle shape
+								shapes.emplace(particleArray[part].shape, static_cast<GLuint>(shapes.size()));
+
+								// Now build a list for that shape
+								BuildList(particleArray[part].shape.size, &shapes[particleArray[part].shape]);
+								}
+					}
+				}
+
 				/** Draws the particles in the particle group to the screen. */
 				void Draw() throw() {
 					glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);							// Clear relevant buffers
@@ -129,11 +150,11 @@ namespace nuke {
 						// Move the particle (No rotation at the moment)
 						glLoadIdentity();
 						glTranslatef(particleArray[part].pos.x, particleArray[part].ppos.y, particleArray[part].pos.z);
-						glColor4fv(particleArray[part].color);
-						glCallList(
-						
-
-			private :
+						glColor4fv(particleArray[part].color);					// Set the color of the particle
+						glCallList(shapes[particleArray[part].shape]);			// Get and draw the shape
+					}
+					
+			private:
 				/** The number of currently active particles in the sytem. */
 				size_t activeCount;
 
@@ -144,12 +165,10 @@ namespace nuke {
 				Textures textures;
 
 				/** Hashtable of shapes that need to be drawn. This is so that
-				 * we only need to make call to a buildlist if more than one
-				 * particle needs to be drawn as the same shape, rather than
-				 * each particle having its own buildlists which would be
-				 * expensive. */
-				unordered_map<string, Gluint> shapes;
-
+				 * we only need to compile a buildlist each time a particle has
+				 * a different shape.
+				 */
+				unordered_map<Shape, Gluint, ShapeHash> shapes;
 		};
 	}
 }

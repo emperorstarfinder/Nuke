@@ -23,9 +23,10 @@
 #define __NUKE_RENDERER_BUILDLISTS__
 
 #include <GL/gl.h>				// OpenGL
-#include <glm/vec3.hpp>			// 3D vectors
+#include "../shape/shape.hpp"	// Shapes
 
 using namespace glm;
+using namespace nuke::shape;	// For DrawableShape
 
 namespace nuke {
 	namespace rend {
@@ -35,7 +36,7 @@ namespace nuke {
 		 * @param _size The size of each side of the cube.
 		 * @aram  _listPointer The integer used to create the list
 		 */
-		GLvoid BuildCubeList(const vec3& _size, GLuint* listPointer)
+		GLvoid CubeList(const vec3& _size, GLuint* listPointer)
 		{
 			*listPointer = glGenLists(1);			// Only need one list for a cube
 			glNewList(*listPointer, GL_COMPILE);	// Store the list at listPointers location & compile
@@ -99,6 +100,25 @@ namespace nuke {
 			glEnd();		// End drawing
 			glEndList();	// End list
 		}
+
+		/** Function to determine which buildlist to create and then to call the
+		 * relevant function. 
+		 *
+		 * @param _size The size of the object to build.
+		 * @param listPointer A pointer to the build list.
+		 */
+		GLvoid BuildList(DrawableShape shape, const vec3& size, GLuint* listpointer)
+		{
+			// Check which shape list function must be called
+			switch (shape) {
+				case CUBE:
+					CubeList(size, listpointer);
+					break;
+
+				default:
+					break;
+			}
+		}	
 	}	// End namespace rend
 }		// End namespace nuke
 

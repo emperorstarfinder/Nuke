@@ -7,6 +7,7 @@
 #include "../renderer/buildlists.hpp"
 #include "../texture/textures.hpp"
 
+using namespace nuke::shape;
 using namespace nuke::rend;
 using namespace nuke::tex;
 
@@ -32,7 +33,7 @@ GLfloat z = -5.0f;					// Depth into the screen
 Textures textureArray;
 GLuint blend;						// Turn the blending on or off
 
-GLuint cube;						// Storage for the display list
+GLuint cube = 1000;						// Storage for the display list
 GLuint top;							// Storage for the second display list
 GLuint xloop;						// Loop for the x axis
 GLuint yloop;						// Loop for the y axis 
@@ -52,7 +53,7 @@ void initGL(int width, int height)
 {
 	//loadGlTextures();							// Load the textures
 	textureArray.append({"textures/Create.bmp"});
-	BuildCubeList(cubeSize, &cube);				//
+	BuildList(DrawableShape::CUBE, cubeSize, &cube);				//
 	glEnable(GL_TEXTURE_2D);					// Enable texture mapping
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);		// Black background
 	glClearDepth(1.0);							// Allows depth buffer to be cleared
