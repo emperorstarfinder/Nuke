@@ -21,8 +21,10 @@
 #ifndef __NUKE_PARTICLES__
 #define __NUKE_PARTICLES__
 
+#include <unordered_map>					// For storing buildlists
 #include "ParticlePolicies.hpp"
 #include "../texture/textures.hpp"
+#include "../rederer/buildlists.hpp"		// For creating build lists
 
 using namespace nuke::tex;		// For Textures class
 
@@ -141,8 +143,12 @@ namespace nuke {
 				/** Textures that are used by the group of particles. */
 				Textures textures;
 
-				/** Drawable shapes that the particles can use. */
-				vector<Gluint> shapes;
+				/** Hashtable of shapes that need to be drawn. This is so that
+				 * we only need to make call to a buildlist if more than one
+				 * particle needs to be drawn as the same shape, rather than
+				 * each particle having its own buildlists which would be
+				 * expensive. */
+				unordered_map<string, Gluint> shapes;
 
 		};
 	}
