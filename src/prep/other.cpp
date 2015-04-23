@@ -47,38 +47,11 @@ static GLfloat topcol[5][3] = {
 	{.5f,0.0f,0.0f},{0.5f,0.25f,0.0f},{0.5f,0.5f,0.0f},{0.0f,0.5f,0.0f},{0.0f,0.5f,0.5f}
 };
 
-// Define an image type 
-typedef struct Image {
-	unsigned long sizeX;
-	unsigned long sizeY;
-	char *data;
-} Image;
-
-/*
-// Load the bitmaps and convert them to textures
-void loadGlTextures()
-{
-	Texture image1("textures/Cube.bmp");
-
-	printf("Size of texture is : %zu", sizeof image1);
-
-	glGenTextures(1, &texture[0]);							// Create the texture
-	glBindTexture(GL_TEXTURE_2D, texture[0]);				// 2D texture (x, y)
-
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);					// Scale cheaply when img bigger than texture
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST);	// Scale cheaply when img smaller than texture
-
-	// Params are:
-	//	[2d tex  ,  detail level     ,  num components, img x size, img y size, border,
-	//	 col data, unsigned byte data, data itself]
-    gluBuild2DMipmaps(GL_TEXTURE_2D, 3, image1.SizeX(), image1.SizeY(), GL_RGB, GL_UNSIGNED_BYTE, image1.Data());
-}
-*/
 // General OpenGL init. Sets all initial params
 void initGL(int width, int height)
 {
 	//loadGlTextures();							// Load the textures
-	textureArray.append({"textures/Cube.bmp"});
+	textureArray.append({"textures/Create.bmp"});
 	BuildCubeList(cubeSize, &cube);				//
 	glEnable(GL_TEXTURE_2D);					// Enable texture mapping
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);		// Black background

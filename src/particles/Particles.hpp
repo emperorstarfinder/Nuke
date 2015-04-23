@@ -116,6 +116,21 @@ namespace nuke {
 						}
 					}
 				}
+
+				/** Draws the particles in the particle group to the screen. */
+				void Draw() throw() {
+					glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);							// Clear relevant buffers
+	
+					for (size_t part = 0; part < activeCount; part++) {							// For each active particle
+						glBindTexture(GL_TEXTURE_2D, textures[particleArray[part].texture]);	// Bind the relevant texture
+
+						// Move the particle (No rotation at the moment)
+						glLoadIdentity();
+						glTranslatef(particleArray[part].pos.x, particleArray[part].ppos.y, particleArray[part].pos.z);
+						glColor4fv(particleArray[part].color);
+						glCallList(
+						
+
 			private :
 				/** The number of currently active particles in the sytem. */
 				size_t activeCount;
@@ -125,6 +140,10 @@ namespace nuke {
 
 				/** Textures that are used by the group of particles. */
 				Textures textures;
+
+				/** Drawable shapes that the particles can use. */
+				vector<Gluint> shapes;
+
 		};
 	}
 }
