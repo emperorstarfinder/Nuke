@@ -24,27 +24,36 @@
 #include <unistd.h>			// Sw that the sleep function can be called
 #include <GL/glut.h>		// Header for the GLUT library
 #include <GL/gl.h>			// Header for the OpenGL32 library
+#include <GL/glut.h>
 #include "Particles.hpp"
+
+#define ESCAPE 27			// Macro for ESC key
 
 const int SCREEN_WIDTH = 640;
 const int SCREEN_HEIGHT = 480;
 
-int window;					// Window for the tests
-
 const size_t NUM_PARTICLES = 1;
+
+int window;					// Handle for the window
+
+using namespace nuke::part;
 
 // Define the particles to use for the visual test
 // Initially the particles will be drawn without a texture
-Particles<NUM_PARTICLES, ParticleInitializer, ParticleAction> particles;
+Particles<NUM_PARTICLES, Particle, ParticleInitializer, ParticleAction> particles;
 
 // Emits the particles and sets their velocity
 void particleConfig()
 {
 	particles.initializerPolicy.velocityPolicy.SetVelocity(vec3(0.2f, 0.3f, 0.f));	// Set their velocity
-	particles.initializerPolicy.sizePolicy.SetSize(vec3(1.f, 1.f, 1.f));			// Set their size
+	particles.initializerPolicy.shapePolicy.SetSize(vec3(1.f, 1.f, 1.f));			// Set their size
+	particles.initializerPolicy.shapePolicy.SetType(DrawableShape::CUBE);			// Set thir shape
 
 	// Emit NUM_PARTICLES at the origin
 	particles.Emit(NUM_PARTICLES, vec3(0.f, 0.f, 0.f)); 
+
+	// Build the shapes for the particles
+	particles.BuildShapes();
 }
 
 // Function to draw the scene. 
@@ -59,7 +68,7 @@ void drawScene()
 }
 
 // Initialize OpenGL 
-intiGL(int width, int height)
+void initGL(int width, int height)
 {
 	// Can set the texture here if we want
 	// Need to call the buildlist here
@@ -111,7 +120,7 @@ void resizeScene(int width, int height)
 	glLoadIdentity();					// Reset the perspective matrix
 
 	// Calculate the aspect ratio of the window
-	gluPerspective(45.f, static_cast<GLfloat>(width) / static_cast<GLfloat>(height), 0.1.f, 100.f);
+	gluPerspective(45.f, static_cast<GLfloat>(width) / static_cast<GLfloat>(height), 0.1f, 100.f);
 	glMatrixMode(GL_MODELVIEW);			// Back to modelview mode
 }   
 
@@ -128,7 +137,7 @@ int main(int argc, char** argv)
 	glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_ALPHA | GLUT_DEPTH);
 
 	// Initialize the window size
-	glutInitWindowSize(SCRREN_WIDTH, SCREEN_HEIGHT);
+	glutInitWindowSize(SCREEN_WIDTH, SCREEN_HEIGHT);
 
 	// Make the top left of the screen (0, 0)
 	glutInitWindowPosition(0, 0);
@@ -137,7 +146,7 @@ int main(int argc, char** argv)
 	window = glutCreateWindow("Particle Visual Tests");
 
 	// Initialize the OpenGL drawing function 
-	glutDisplayFunc(&drawScrene);
+	glutDisplayFunc(&drawScene);
 
 	// Make the window fullscreen 
 	glutFullScreen();
@@ -149,7 +158,7 @@ int main(int argc, char** argv)
 	glutReshapeFunc(&resizeScene);
 
 	// Register the keyboard checking function 
-	glutKeyboadFunc(&keyPressed);
+	glutKeyboardFunc(&keyPressed);
 
 	// Check for special keys
 	// glutSpecialFunc(&<Special Function Name>);

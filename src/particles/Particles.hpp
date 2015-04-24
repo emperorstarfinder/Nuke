@@ -76,7 +76,7 @@ namespace nuke {
 				 * @param texNames The names of the texture to bind.
 				 */
 				inline void BindTextures(initializer_list<const char*> texNames) throw() {
-					textures.append(texNames);
+					textureArray.append(texNames);
 				}
 
 				/** Emit a certain number of particles at a certain position. 
@@ -135,7 +135,9 @@ namespace nuke {
 								shapes.emplace(particleArray[part].shape, static_cast<GLuint>(shapes.size()));
 
 								// Now build a list for that shape
-								BuildList(particleArray[part].shape.size, &shapes[particleArray[part].shape]);
+								BuildList(particleArray[part].shape.type,		// Type of shape to build
+										  particleArray[part].shape.size,		// Size of shape to build
+										  &shapes[particleArray[part].shape]);	// Pointer to built shape handle
 						}
 					}
 				}
@@ -145,13 +147,19 @@ namespace nuke {
 					glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);							// Clear relevant buffers
 	
 					for (size_t part = 0; part < activeCount; part++) {							// For each active particle
-						glBindTexture(GL_TEXTURE_2D, textures[particleArray[part].texture]);	// Bind the relevant texture
+						glBindTexture(GL_TEXTURE_2D, textureArray.textures[particleArray[part].texture]);	// Bind the relevant texture
 
 						// Move the particle (No rotation at the moment)
 						glLoadIdentity();
-						glTranslatef(particleArray[part].pos.x, particleArray[part].ppos.y, particleArray[part].pos.z);
-						glColor4fv(particleArray[part].color);					// Set the color of the particle
-						glCallList(shapes[particleArray[part].shape]);			// Get and draw the shape
+						// Move the particle to its location
+						glTranslatef(particleArray[part].pos.x, particleArray[part].pos.y, particleArray[part].pos.z);
+						// Set the color to draw to that of the particle
+						glColor4f(particleArray[part].color.x,					// R channel
+								  particleArray[part].color.y,					// G channel
+								  particleArray[part].color.z,					// B channel
+								  particleArray[part].color.w);					// A channel
+						// Call the compiled shape
+						glCallList(shapes[particleArray[part].shape]);			
 					}
 				}
 					
@@ -163,7 +171,7 @@ namespace nuke {
 				ParticleType particleArray[size];
 
 				/** Textures that are used by the group of particles. */
-				Textures textures;
+				Textures textureArray;
 
 				/** Hashtable of shapes that need to be drawn. This is so that
 				 * we only need to compile a buildlist each time a particle has
