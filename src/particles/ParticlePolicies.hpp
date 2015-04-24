@@ -135,7 +135,7 @@ namespace nuke {
 				vec4 color;				/**< Color to make the particles. */
 			public :
 				/** Constructs a default color as white, completely opaque. */
-				explicit ColorInitializer() throw() : color(1.f, 1.f, 1.f, 0.f) {}
+				explicit ColorInitializer() throw() : color(1.f, 1.f, 1.f, 1.f) {}
 
 				/** Set the color that the particles will be made. 
 				 *

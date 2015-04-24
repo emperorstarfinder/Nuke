@@ -51,9 +51,10 @@ namespace nuke {
 				 * @param newTexNames The names of the new textures to add.
 				 */
 				void append(initializer_list<const char*> texNames) throw() {
+					GLuint handle = 0;								// Handle for the added texture
 					for (auto& texName : texNames) {				
 						textureInfo.emplace_back(texName);			// Add new texture info
-						textures.push_back(GLuint(0));				// Add new texture
+						textures.push_back(handle++);				// Add new texture
 					}
 
 					// Containers now have the necessary elements, now initalize

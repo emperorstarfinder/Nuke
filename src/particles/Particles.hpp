@@ -144,22 +144,30 @@ namespace nuke {
 
 				/** Draws the particles in the particle group to the screen. */
 				void Draw() throw() {
-					glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);							// Clear relevant buffers
-	
-					for (size_t part = 0; part < activeCount; part++) {							// For each active particle
-						glBindTexture(GL_TEXTURE_2D, textureArray.textures[particleArray[part].texture]);	// Bind the relevant texture
+					// Make sure that there is a texture loaded
+					if (textureArray.textures.size() > 0) {
+						// Then drawing can be done
+						//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);							// Clear relevant buffers
+		
+						for (size_t part = 0; part < activeCount; part++) {							// For each active particle
+							glBindTexture(GL_TEXTURE_2D, textureArray.textures[particleArray[part].texture]);	// Bind the relevant texture
 
-						// Move the particle (No rotation at the moment)
-						glLoadIdentity();
-						// Move the particle to its location
-						glTranslatef(particleArray[part].pos.x, particleArray[part].pos.y, particleArray[part].pos.z);
-						// Set the color to draw to that of the particle
-						glColor4f(particleArray[part].color.x,					// R channel
-								  particleArray[part].color.y,					// G channel
-								  particleArray[part].color.z,					// B channel
-								  particleArray[part].color.w);					// A channel
-						// Call the compiled shape
-						glCallList(shapes[particleArray[part].shape]);			
+							// Move the particle (No rotation at the moment)
+							glLoadIdentity();
+							// Move the particle to its location
+							glTranslatef(particleArray[part].pos.x, particleArray[part].pos.y, particleArray[part].pos.z);
+							// Set the color to draw to that of the particle
+							glColor4f(particleArray[part].color.x,					// R channel
+									  particleArray[part].color.y,					// G channel
+									  particleArray[part].color.z,					// B channel
+									  particleArray[part].color.w);					// A channel
+							// Call the compiled shape
+							glCallList(shapes[particleArray[part].shape]);			
+						}
+					}
+					else {
+						// Should do some error checking here 
+						printf("Error P01 : Not texture loaded for drawing.");
 					}
 				}
 					

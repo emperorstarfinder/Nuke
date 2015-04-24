@@ -22,7 +22,7 @@ TEST_EXE_NAME = nuke-lin-tests
 ###########################################
 
 BUILD_DIR 	= builds
-SRC_DIR		= src/prep
+SRC_DIR		= src/nuke
 TST_DIR 	= tests
 
 ###########################################
@@ -38,9 +38,9 @@ TEST_EXE 	= $(addprefix $(BUILD_DIR)/,$(TEST_EXE_NAME))
 # 				SOURCES					 #
 ##########################################
 
-COM_MODULES  = nuke.cpp
+COM_MODULES  = 
 TST_MODULES  = tests.cpp
-TGT_MODULES  = 
+TGT_MODULES  = nuke.cpp
 OTH_MODULES  = other.cpp
 
 COM_SOURCES  = $(addprefix $(SRC_DIR)/,$(COM_MODULES))

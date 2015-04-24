@@ -24,7 +24,7 @@ vec3 cubeSize(2.0f, 2.0f, 2.0f);
 #define LEFT_ARROW	75			
 #define RIGHT_ARROW	77			
 
-const int NUM_PARTICLES = 1;
+const int NUM_PARTICLES = 2;
 
 int window;				    // Number of the GLUT window
 int light;					// Lighting (1 = ON, 0 = OFF)
@@ -45,28 +45,22 @@ GLuint yloop;						// Loop for the y axis
 // Initially the particles will be drawn without a texture
 Particles<NUM_PARTICLES, Particle, ParticleInitializer, ParticleAction> particles;
 
-// Define colors for the boxes
-static GLfloat boxcol[5][3] = {
-	{1.0f,0.0f,0.0f},{1.0f,0.5f,0.0f},{1.0f,1.0f,0.0f},{0.0f,1.0f,0.0f},{0.0f,1.0f,1.0f}
-};
-
-// Define colors for the top of the boxes
-static GLfloat topcol[5][3] = {
-	{.5f,0.0f,0.0f},{0.5f,0.25f,0.0f},{0.5f,0.5f,0.0f},{0.0f,0.5f,0.0f},{0.0f,0.5f,0.5f}
-};
-
 void particleConfig()
 {
 	particles.initializerPolicy.velocityPolicy.SetVelocity(vec3(0.002f, 0.003f, 0.f));	// Set their velocity
 	particles.initializerPolicy.shapePolicy.SetSize(vec3(0.5f, 0.5f, 0.5f));		    // Set their size
-	particles.initializerPolicy.shapePolicy.SetType(DrawableShape::CUBE);			    // Set the shape
-	particles.initializerPolicy.colorPolicy.SetColor(vec4(0.5f, 0.5f, 0.5f, 1.0f));		// Set the color
+	particles.initializerPolicy.colorPolicy.SetColor(vec4(0.5f, 1.0f, 1.0f, 1.0f));		// Set the color
 
 	// Emit NUM_PARTICLES at the origin
-	particles.Emit(NUM_PARTICLES, vec3(0.f, 0.f, -6.f)); 
+	particles.Emit(1, vec3(0.f, 0.f, -6.f)); 
+
+	particles.initializerPolicy.velocityPolicy.SetVelocity(vec3(-0.002, -0.003, -0.1));
+	particles.initializerPolicy.shapePolicy.SetSize(vec3(0.5f, 0.5f, 0.5f));		    // Set their size
+	particles.initializerPolicy.colorPolicy.SetColor(vec4(0.0f, 1.0f, 0.0f, 0.2f));		// Set the color
+	particles.Emit(1, vec3(-0.3, 0.f, -4.f));
 
 	// Load a texture for the particles (REQUIRED)
-	particles.BindTextures({"textures/Crate.bmp"});
+	particles.BindTextures({"textures/Cube.bmp"});
 
 	// Build the shapes for the particles
 	particles.BuildShapes();
@@ -76,8 +70,6 @@ void particleConfig()
 void initGL(int width, int height)
 {
 	particleConfig();
-	//textureArray.append({"textures/Crate.bmp"});
-	//BuildList(DrawableShape::CUBE, cubeSize, &cube);				//
 	glEnable(GL_TEXTURE_2D);					// Enable texture mapping
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);		// Black background
 	glClearDepth(1.0);							// Allows depth buffer to be cleared
@@ -121,28 +113,10 @@ void drawGlScene()
 	// Clear the color and the depth buffers 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);	
 	
-	//glBindTexture(GL_TEXTURE_2D, textureArray.textures[0]);
-
-	// Make a pyramid like structure from cubes
-	/*for (yloop = 1; yloop < 6; yloop++) {
-		for (xloop = 0; xloop < yloop; xloop++) {
-			glLoadIdentity();
-
-			glTranslatef(1.4f+(((float)xloop)*2.8f)-(((float)yloop)*1.4f),((6.0f-((float)yloop))*2.4f)-7.0f,-20.0f);
-
-			glRotatef(45.0f - (2.0f*yloop)+rotX, 1.0f, 0.0f, 0.0f);
-			glRotatef(45.0f + rotY, 0.0f, 1.0f, 0.0f);
-
-			glColor3fv(boxcol[yloop-1]);	    
-			glCallList(cube);
-	    
-			glColor3fv(topcol[yloop-1]);
-			glCallList(top);
-		}
-	}*/
-
+	// Draw the particles to the screen
 	particles.Draw();
 
+	// Update the particle attributes
 	particles.Update();
 	
 	// Double buffered so swap the buffers 
