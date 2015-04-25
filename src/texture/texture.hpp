@@ -185,25 +185,25 @@ namespace nuke {
 			fseek(file, 18, SEEK_CUR);
 
 			// Read the width
-			sizeX = getint (file);
+			sizeX = GetInt(file);
 			printf("Width of : %s : %lu\n", filename, sizeX);		// Testing
 			
 			// Read the height 
-			sizeY = getint (file);
+			sizeY = GetInt(file);
 			printf("Height of : %s : %lu\n", filename, sizeY);		// Testing
 
-			// Calculate the size (assuming 24 bits and 3 bytes per pixel
+			// Calculate the size (assuming 24 bits and 3 bytes per pixel)
 			size = sizeX * sizeY * 3;
 
 			// Read the planes
-			planes = getshort(file);
+			planes = GetShort(file);
 			if (planes != 1) {
 				printf("ERROR T02 :Planes is not 1 : %u\n", planes);
 				return 0;
 			}
 
 			// Read the bpp
-			bpp = getshort(file);
+			bpp = GetShort(file);
 			if (bpp != 24) {
 				printf("ERROR T03 : Bpp from is not 24 : %u\n", bpp);
 				return 0;
@@ -213,7 +213,7 @@ namespace nuke {
 			fseek(file, 24, SEEK_CUR);
 
 			// Read in the pixel data 
-			data = (char *)malloc(size);		// Allocate some space
+			data = (char *)malloc(size);	
 			if (data == NULL) {
 				printf("ERROR T04 : Couldn't allocate the memory for texture data\n");
 				return 0;
@@ -224,14 +224,14 @@ namespace nuke {
 				return 0;
 			}
 
-			// Reverse all if the colors (bgr -> rgb)
+			// Reverse colors (bgr -> rgb)
 			for (i = 0; i < size; i+=3) {		// Each pixel
-				temp = data[i];					// blue as temp
-				data[i] = data[i+2];			// Blue to red
-				data[i+2] = temp;				// Red to blue
+				temp		= data[i];			// blue as temp
+				data[i]		= data[i+2];		// Blue to red
+				data[i+2]	= temp;				// Red to blue
 			}
 
-			return 1;							// Success, yay =D	
+			return 1;						
 		}
 
 	}	// End namspace tex

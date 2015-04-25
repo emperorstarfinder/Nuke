@@ -29,15 +29,19 @@ typedef unsigned int uint;
 typedef unsigned short ushort;
 
 namespace nuke {
-	namespace tex {
-	
-		/** Function to get an integer from a file.
+	namespace tex {	
+		/*
+		 * ================================================================
+		 * Function		: Getint
 		 *
-		 *  @param fp A file pointer to the file from which the int must be
-		 *  gotten.
-		 *  @return The integer from the file.
+		 * Description	: Gets a 32 bit integer from a file, returns the 
+		 *				  integer.
+		 *
+		 * Params		: fp	: A FILE pointer to the file from which the 
+		 *						  integer must be taken.
+		 * ================================================================
 		 */
-		inline uint getint(FILE* fp) {
+		inline uint GetInt(FILE* fp) {
 			int c, c1, c2, c3;
 
 			// Get 4 bytes
@@ -45,19 +49,24 @@ namespace nuke {
 			c2 = getc(fp); c3 = getc(fp);
 
 			// Return the result
-			return (static_cast<uint>(c) +
-				    (static_cast<uint>(c1) << 8) +
-				    (static_cast<uint>(c2) << 16) +
-				    (static_cast<uint>(c3) << 24));
+			return (static_cast<uint>(c) + 
+					(static_cast<uint>(c1) << 8) +
+				    (static_cast<uint>(c2) << 16) + 
+					(static_cast<uint>(c3) << 24));
 		}
 
-		/** Function to get a short from a file.
+		/*
+		 * ==================================================================
+		 * Function		: Getshort
 		 *
-		 * @param fp A file pointer to the file from which the short should be
-	     * fetched.
-	     * @return the short from the file.
+		 * Description	: Gets a short (16 bit integer) from a file, returns
+		 *			      the integer. Function to get a short from a file.
+		 *
+		 * Params		: fp	: A FILE pointer to the file from which the 
+		 *						  integer must be taken.
+		 * ==================================================================
 	     */
-		inline ushort getshort(FILE* fp) {
+		inline ushort GetShort(FILE* fp) {
 			int c, c1;
 
 			// Get 2 bytes
@@ -69,4 +78,4 @@ namespace nuke {
 	}		// End namespace tex
 }			// End namespac nuke
 
-#endif		// __NUKR_TEXTURE_UTILS__
+#endif		// __NUKE_TEXTURE_UTILS__
