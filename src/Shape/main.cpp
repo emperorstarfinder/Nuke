@@ -1,19 +1,19 @@
 // Shape tests
-#include "shape.hpp"
+#include "Shape.hpp"
 #include <GL/gl.h>
 #include <iostream>
 
-using namespace nuke::shape;
+using namespace gfx::shape;
 
 int main()
 {
 	// Create hash table
-	unordered_map<Shape, GLuint, ShapeHash> shapes;
+	unordered_map<gfxShape, GLuint, gfxShapeHash> shapes;
 
 	// Make some shapes
-	Shape cube(DrawableShape::CUBE, vec3(1.0f, 1.0f, 1.0f));
-	Shape none(DrawableShape::NONE, vec3(2.0f, 1.0f, 1.0f));
-	Shape cube2(DrawableShape::CUBE, vec3(1.0f, 2.0f, 3.0f));
+	gfxShape cube(DrawableShapes::CUBE, vec3(1.0f, 1.0f, 1.0f));
+	gfxShape none(DrawableShapes::NONE, vec3(2.0f, 1.0f, 1.0f));
+	gfxShape cube2(DrawableShapes::CUBE, vec3(1.0f, 2.0f, 3.0f));
 
 	shapes.emplace(cube, (GLuint)0);
 	shapes.emplace(none, (GLuint)1);
