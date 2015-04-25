@@ -18,8 +18,8 @@
  *	Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#ifndef __NUKE_TEXTURE__
-#define __NUKE_TEXTURE__
+#ifndef __GFX_TEXTURE__
+#define __GFX_TEXTURE__
 
 #include <string.h>
 #include <stdio.h>
@@ -46,7 +46,7 @@ constexpr unsigned int Strtoui(const char* str, int hash = 0)
 	return !str[hash] ? 5381 : (Strtoui(str, hash + 1) * 33) ^ str[hash];
 }
 
-namespace nuke {
+namespace gfx {
 	namespace tex {
 		/*
 		 * =================================================================
@@ -241,6 +241,6 @@ namespace nuke {
 		}
 
 	}	// End namspace tex
-}		// End namespace nuke
+}		// End namespace gfx
 
-#endif	// __NUKE_TEXTURE__
+#endif	// __GFX_TEXTURE__

@@ -10,7 +10,7 @@
 
 using namespace nuke::shape;
 using namespace nuke::rend;
-using namespace nuke::tex;
+using namespace gfx::tex;
 //using namespace nuke::part;
 
 vec3 cubeSize(2.0f, 2.0f, 2.0f);

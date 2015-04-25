@@ -18,8 +18,8 @@
  *	Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#ifndef __NUKE_TEXTURE_UTILS__
-#define __NUKE_TEXTURE_UTILS__
+#ifndef __GFX_TEXTURE_UTILS__
+#define __GFX_TEXTURE_UTILS__
 
 #include <unistd.h>
 #include <stdio.h>
@@ -28,7 +28,7 @@
 typedef unsigned int uint;
 typedef unsigned short ushort;
 
-namespace nuke {
+namespace gfx {
 	namespace tex {	
 		/*
 		 * ================================================================
@@ -76,6 +76,6 @@ namespace nuke {
 			return (static_cast<uint>(c) + (static_cast<uint>(c1) << 8));
 		}
 	}		// End namespace tex
-}			// End namespac nuke
+}			// End namespac gfx
 
-#endif		// __NUKE_TEXTURE_UTILS__
+#endif		// __GFX_TEXTURE_UTILS__

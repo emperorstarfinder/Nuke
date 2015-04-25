@@ -18,15 +18,15 @@
  *	Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#ifndef __NUKE_TEXTURES__
-#define __NUKE_TEXTURES__
+#ifndef __GFX_TEXTURES__
+#define __GFX_TEXTURES__
 
 #include <GL/gl.h>				// GLuint
 #include <vector>				// Dynamic allocation of textures
 #include <initializer_list>		// For list construction
 #include "Texture.hpp"			// For a single texture
 
-namespace nuke {
+namespace gfx {
 	namespace tex {
 		/*
 		 * ===================================================================================
@@ -115,8 +115,8 @@ namespace nuke {
 			}
 		};
 	}		// End namespace tex
-}			// End namespace nuke
+}			// End namespace gfx
 
-#endif		// __NUKE_TEXTURES__
+#endif		// __GFX_TEXTURES__
 
 
