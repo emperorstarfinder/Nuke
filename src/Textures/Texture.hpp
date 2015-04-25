@@ -21,11 +21,9 @@
 #ifndef __NUKE_TEXTURE__
 #define __NUKE_TEXTURE__
 
-#include <sstream>
-#include <iostream>
 #include <string.h>
 #include <stdio.h>
-#include "textureutils.hpp"
+#include "TextureUtils.hpp"
 
 typedef unsigned long ulong;
 typedef unsigned short int ushorti;
@@ -50,8 +48,15 @@ constexpr unsigned int Strtoui(const char* str, int hash = 0)
 
 namespace nuke {
 	namespace tex {
-		/** Class for storing a texture from various file formats. */
-		class Texture 
+		/*
+		 * =================================================================
+		 * Class		: gfxTexture
+		 *
+		 * Description	: Stores images data and size to use as an OpenGL
+		 *				  texture.
+		 * =================================================================
+		*/
+		class gfxTexture 
 		{
 			public:
 				/*

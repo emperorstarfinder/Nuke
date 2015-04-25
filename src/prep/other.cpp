@@ -5,13 +5,13 @@
 #include <GL/gl.h>			// Header for the OpenGL32 library
 #include <GL/glut.h>		// Header for the GLu32 library
 #include "../renderer/buildlists.hpp"
-#include "../texture/textures.hpp"
-#include "../particles/Particles.hpp"
+#include "../Textures/Textures.hpp"
+//#include "../particles/Particles.hpp"
 
 using namespace nuke::shape;
 using namespace nuke::rend;
 using namespace nuke::tex;
-using namespace nuke::part;
+//using namespace nuke::part;
 
 vec3 cubeSize(2.0f, 2.0f, 2.0f);
 
@@ -43,7 +43,7 @@ GLuint yloop;						// Loop for the y axis
 
 // Define the particles to use for the visual test
 // Initially the particles will be drawn without a texture
-Particles<NUM_PARTICLES, Particle, ParticleInitializer, ParticleAction> particles;
+//Particles<NUM_PARTICLES, Particle, ParticleInitializer, ParticleAction> particles;
 
 // Define colors for the boxes
 static GLfloat boxcol[5][3] = {
@@ -54,7 +54,7 @@ static GLfloat boxcol[5][3] = {
 static GLfloat topcol[5][3] = {
 	{.5f,0.0f,0.0f},{0.5f,0.25f,0.0f},{0.5f,0.5f,0.0f},{0.0f,0.5f,0.0f},{0.0f,0.5f,0.5f}
 };
-
+/*
 void particleConfig()
 {
 	particles.initializerPolicy.velocityPolicy.SetVelocity(vec3(0.002f, 0.003f, 0.f));	// Set their velocity
@@ -71,13 +71,13 @@ void particleConfig()
 	// Build the shapes for the particles
 	particles.BuildShapes();
 }
-
+*/
 // General OpenGL init. Sets all initial params
 void initGL(int width, int height)
 {
-	particleConfig();
-	//textureArray.append({"textures/Crate.bmp"});
-	//BuildList(DrawableShape::CUBE, cubeSize, &cube);				//
+	//particleConfig();
+	textureArray.append({"textures/Crate.bmp"});
+	BuildList(DrawableShape::CUBE, cubeSize, &cube);				//
 	glEnable(GL_TEXTURE_2D);					// Enable texture mapping
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);		// Black background
 	glClearDepth(1.0);							// Allows depth buffer to be cleared
@@ -121,10 +121,10 @@ void drawGlScene()
 	// Clear the color and the depth buffers 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);	
 	
-	//glBindTexture(GL_TEXTURE_2D, textureArray.textures[0]);
+	glBindTexture(GL_TEXTURE_2D, textureArray.textures[0]);
 
 	// Make a pyramid like structure from cubes
-	/*for (yloop = 1; yloop < 6; yloop++) {
+	for (yloop = 1; yloop < 6; yloop++) {
 		for (xloop = 0; xloop < yloop; xloop++) {
 			glLoadIdentity();
 
@@ -139,11 +139,11 @@ void drawGlScene()
 			glColor3fv(topcol[yloop-1]);
 			glCallList(top);
 		}
-	}*/
+	}
 
-	particles.Draw();
+	//particles.Draw();
 
-	particles.Update();
+	//particles.Update();
 	
 	// Double buffered so swap the buffers 
 	// to display what was just drawn
