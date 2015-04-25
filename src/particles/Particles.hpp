@@ -1,5 +1,5 @@
 /*
- *  Particles class for Nuke.
+ *  Particles class.
  *
  *  Copyright (C) 2015 Rob Clucas robclu1818@gmail.com
  *
@@ -18,102 +18,154 @@
  *	Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#ifndef __NUKE_PARTICLES__
-#define __NUKE_PARTICLES__
+#ifndef __GFX_PARTICLES__
+#define __GFX_PARTICLES__
 
 #include "ParticlePolicies.hpp"
-#include "../texture/textures.hpp"
-#include "../renderer/buildlists.hpp"		// For creating build lists
-#include "../shape/shape.hpp"				// For Shape class
+#include "../Texture/Textures.hpp"
+#include "../Render/BuildList.hpp"		// For creating build lists
+#include "../Shape/Shape.hpp"			// For Shape class
 
-using namespace nuke::tex;		    // For Textures class
-using namespace nuke::shape;		// For Shape and ShapeHash
-using namespace nuke::rend;			// For BuildList
+using namespace gfx::tex;				// For Textures class
+using namespace gfx::shape;			// For Shape and ShapeHash
+using namespace gfx::rend;				// For BuildList
 
-namespace nuke {
+namespace gfx {
 	namespace part {
-		/** 
-		 * \class Patricles class used to group numeroud particles and update their
-		 * states.
+		/*
+		 * ==================================================================
+		 * Class		: Particles 
+		 *
+		 * Description	: Class that is a container for holding any number of 
+		 *				  gfxParticle objects. 
+		 * ===================================================================
 		 */
-		template<size_t size, class ParticleType, class InitializerPolicy, class ActionPolicy>
-		class Particles
+		template<size_t size,			  class ParticleType, 
+				 class InitializerPolicy, class ActionPolicy>
+		class gfxParticles
 		{
 			public:
-				/** Initializer policy used to initalize new particles. */
-				InitializerPolicy initializerPolicy;
+				InitializerPolicy initializerPolicy;	// Defines initial state
+				ActionPolicy	  actionPolicy;			// Defines actions 
+			public:
+				/*
+				 * ===========================================================
+				 * Function		: Particles 
+				 *
+				 * Description	: Default constructor for gfxParticles, sets 
+				 *				  no particles to be active. 
+				 * ===========================================================
+				 */
+				explicit gfxParticles() throw() : activeCount(0) {}
 
-				/** Action policy used to perform actions on the particles. */
-				ActionPolicy actionPolicy;
+				/*
+				 * ===========================================================
+				 * Function		: ~gfxParticles
+				 *
+				 * Description	: Destructs particles
+				 * ===========================================================
+				 */
+				~gfxParticles() throw() {}
 
-				/** Construct the particles. */
-				explicit Particles() throw() : activeCount(0) {}
-
-				/** Destruct the particles. */
-				~Particles() throw() {}
-
-				/** Retuns the maximum number of particles for the system. */
+				/*
+				 * ===========================================================
+				 * Function		: MaxParticles
+				 *
+				 * Description	: Returns the maximum number of particles for 
+				 *				  allowed for the gfxParticle system. 
+				 * ===========================================================
+				 */
 				inline const size_t MaxParticles() const throw() {
 					return size;
 				}
 
-				/** Returns the number of currently active (alive) particles. */
+				/*
+				 * ============================================================
+				 * Function		: NumActiveParticles
+				 *
+				 * Description	:  Returns the number of currently active 
+				 *				   particles, particles with life.
+				 * ============================================================
+				 */
 				inline const size_t NumActiveParticles() const throw() {
 					return activeCount;
 				}
 
-				/** Returns a pointer to the particle array representing the system. */
+				/*
+				 * ============================================================
+				 * Function		: GetParticles 
+				 *
+				 * Description	: Returns a pointer to the particle array, 
+				 *				  which holds systems gfxParticle elements.
+				 * ============================================================
+				 */
 				inline const ParticleType* GetParticles() const throw() {
-					if (NumActiveParticles() == 0) {
+					if ( NumActiveParticles() == 0 ) {
 						return 0;
 					}
 					return particleArray;
 				}
 
-				/** Binds textures to OpenGL context which are supplied as
-				 * arguments.
+				/*
+				 * ============================================================
+				 * Function		: AddTextures
 				 *
-				 * @param texNames The names of the texture to bind.
+				 * Description	: Adds gfxTexture objects to the container of 
+				 *				  gfxTextures.
+				 *
+				 * Params		: texNames	: A list of texture names (names 
+				 *							  of the inamge files) to add as
+				 *							  gfxTextures.
+				 * ============================================================
 				 */
-				inline void BindTextures(initializer_list<const char*> texNames) throw() {
-					textureArray.append(texNames);
+				inline void AddTextures( initializer_list<const char*> texNames ) throw() {
+					textureArray.append( texNames );
 				}
 
-				/** Emit a certain number of particles at a certain position. 
+				/*
+				 * ===========================================================
+				 * Function		: Emit
 				 *
-				 * @param _amount The number of particles to emit.
-				 * @param _position The location of the emmition.
+				 * Description	: Emits (makes active) a certain number of 
+				 *				  gfxParticle objects at a certain position.
+				 *
+				 * Params		: _amount	: The number of gfxPartice 
+				 *							  objectst to make active.
+				 *				: _position	: The position of the gfxParticle
+				 *							  objects. 
+				 * ===========================================================
 				 */
-				void Emit(const size_t& _amount, const vec3& _position) {
-					size_t amount = _amount;									// Can't change _amount
-					if ((NumActiveParticles() + amount) > MaxParticles()) {		// Too many particles for system
-						amount = MaxParticles() - NumActiveParticles();			// Set to max number of particles that can be added C
+				void Emit( const size_t& _amount, const vec3& _position ) {
+					size_t amount = _amount;									
+					if ( (NumActiveParticles() + amount) > MaxParticles() ) {	// Too many particles for system
+						amount = MaxParticles() - NumActiveParticles();			// Set to max number of particles that can be added 
 					}
-					if (amount > 0) {											// Check valid amount
-						size_t numActive = activeCount;							// Counter for the new particles to be added
-						activeCount += amount;									// Create more particles
-						for (; numActive < activeCount; numActive++) {			// Add particle to the system at end of array
+					if ( amount > 0 ) {										
+						size_t numActive = activeCount;							// Counter for the new particles to add
+						activeCount += amount;									// Allow for more particles
+						for (; numActive < activeCount; numActive++) {			
 							particleArray[numActive].pos = _position;			
-							initializerPolicy(particleArray[numActive]);		// Initialize the particle
+							initializerPolicy( particleArray[numToAdd] );		// Initialize the particle
 						}
 					}
 				}
 
-				/** 
-				 * Update the states of the particles.
-				 * This involves performing all the actions defined by the action
-				 * policies and getting rid of 'dead' pparticles.
+				/*
+				 * ===========================================================
+				 * Function		: Update 
+				 *
+				 * Description	: Updates the states of all active gfxParticle 
+				 *				  objects. Each action is defined by a policy.
+				 * ===========================================================
 				 */
 				void Update() throw() {
-					actionPolicy.PrepareAction();								// Prepare all action policies
-					for (size_t count = 0; count < activeCount; ) {				// Kill all dead particles
-						actionPolicy(particleArray[count]);						// Apply all the action policies to the particle
-						if (particleArray[count].life < 0) {			
-							// Particle is dead so swap it to the last active article in the array
-							particleArray[count] = particleArray[activeCount];
+					actionPolicy.PrepareAction();								
+					for ( size_t count = 0; count < activeCount; ) {			
+						actionPolicy( particleArray[count] );					// Apply all action policies
+						if ( particleArray[count].life < 0 ) {			
+							particleArray[count] = particleArray[activeCount];	// Swap dead particle with last known active particle
 							activeCount--;										// Decrease number of active particles
-						}
-						else {
+						} else {
 							// If it isn't dead, move to the next one (swapped one could
 							// also be dead and we can't miss any dead particles)
 							++count;
@@ -121,73 +173,65 @@ namespace nuke {
 					}
 				}
 
-				/** Compiles buildlists for the shapes that the partices need. 
-				 * This should be done before the main loop execution to take
-				 * advantage of the rendering speed it will result in.
+				/*
+				 * ============================================================
+				 * Function		: BuildShapes
+				 *
+				 * Description	: Compiles buildlists for the shapes that the 
+				 *				  the gfxParticle objectsneed. 
+				 * ============================================================
 				 */
 				void BuildShapes() throw() {
-					// For each active particle
-					for (size_t part = 0; part < activeCount; part++) {
-						// Check to see if a build list has been compiled for this shape
-						if (shapes.find(particleArray[part].shape) == shapes.end()) {
-								// If not found hen we need to add this shape 
-								// (GLuint) with the key as the particle shape
-								shapes.emplace(particleArray[part].shape, static_cast<GLuint>(shapes.size()));
+					for ( size_t part = 0; part < activeCount; part++ ) {
+						if ( shapes.find( particleArray[part].shape ) == shapes.end() ) {	// Check if there is a build list for this shape
+								// If not found hen we need to add this shape to
+								// the shapes container with the gfxShape as  the key
+								shapes.emplace( particleArray[part].shape, static_cast<GLuint>( shapes.size() ) );
 
-								// Now build a list for that shape
-								BuildList(particleArray[part].shape.type,		// Type of shape to build
-										  particleArray[part].shape.size,		// Size of shape to build
-										  &shapes[particleArray[part].shape]);	// Pointer to built shape handle
+								// gfxParticle shape is definitely in shapes container
+								BuildList( particleArray[part].shape.type,					// Type of shape to build
+										   particleArray[part].shape.size,					// Size of shape to build
+										   &shapes[particleArray[part].shape] );			// Pointer to built shape handle
 						}
 					}
 				}
 
-				/** Draws the particles in the particle group to the screen. */
+				/*
+				 * =============================================================
+				 * Function		: Draw
+				 *
+				 * Description	:  Draws all active gfxParticle objects onto 
+				 *				   the screen.
+				 * =============================================================
+				*/
 				void Draw() throw() {
-					// Make sure that there is a texture loaded
-					if (textureArray.textures.size() > 0) {
-						// Then drawing can be done
-						//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);							// Clear relevant buffers
-		
-						for (size_t part = 0; part < activeCount; part++) {							// For each active particle
-							glBindTexture(GL_TEXTURE_2D, textureArray.textures[particleArray[part].texture]);	// Bind the relevant texture
-
-							// Move the particle (No rotation at the moment)
-							glLoadIdentity();
-							// Move the particle to its location
-							glTranslatef(particleArray[part].pos.x, particleArray[part].pos.y, particleArray[part].pos.z);
-							// Set the color to draw to that of the particle
-							glColor4f(particleArray[part].color.x,					// R channel
-									  particleArray[part].color.y,					// G channel
-									  particleArray[part].color.z,					// B channel
-									  particleArray[part].color.w);					// A channel
-							// Call the compiled shape
-							glCallList(shapes[particleArray[part].shape]);			
+					if ( textureArray.textures.size() > 0 ) {						// Make sure that there is a texture to bind		
+						for ( size_t part = 0; part < activeCount; part++ ) {							
+							glBindTexture( GL_TEXTURE_2D, textureArray.textures[particleArray[part].texture] );	
+							glLoadIdentity();										// Back to origin
+							glTranslatef (particleArray[part].pos.x,				// Move to particle position
+										  particleArray[part].pos.y, 
+										  particleArray[part].pos.z);
+							glColor4f( particleArray[part].color.r,					// Set the color
+									   particleArray[part].color.g,					
+									   particleArray[part].color.b,					
+									   particleArray[part].color.a);				
+							glCallList( shapes[particleArray[part].shape] );		// Call the compiles shape
 						}
-					}
-					else {
+					}	else {
 						// Should do some error checking here 
 						printf("Error P01 : Not texture loaded for drawing.");
 					}
 				}
-					
 			private:
-				/** The number of currently active particles in the sytem. */
-				size_t activeCount;
-
-				/** Array of size particles of ParticleType which make up the system. */
-				ParticleType particleArray[size];
-
-				/** Textures that are used by the group of particles. */
-				Textures textureArray;
-
-				/** Hashtable of shapes that need to be drawn. This is so that
-				 * we only need to compile a buildlist each time a particle has
-				 * a different shape.
-				 */
-				unordered_map<Shape, GLuint, ShapeHash> shapes;
+				size_t						activeCount;			// Number of active particles
+				ParticleType				particleArray[size];	// Array holding the particles
+				gfxTextures					textureArray;			// Textures used by the particles
+				unordered_map<gfxShape, 
+							  GLuint, 
+							  gfxShapeHash> shapes;					// Shapes used by the particles
 		};
 	}
 }
 
-#endif // __NUKE_PARTICLES__
+#endif // __GFX_PARTICLES__

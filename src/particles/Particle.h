@@ -1,5 +1,5 @@
 /*
- *  Particle class for Nuke.
+ *  Particle class 
  *
  *  Copyright (C) 2015 Rob Clucas robclu1818@gmail.com
  *
@@ -18,34 +18,39 @@
  *	Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#ifndef __NUKE_PARTICLE__
-#define __NUKE_PARTICLE__
+#ifndef __GFX_PARTICLE__
+#define __GFX_PARTICLE__
 
 #include <GL/gl.h>
-#include "../shape/shape.hpp"
-#include "../texture/texture.hpp"
+#include "../Shape/Shape.hpp"
+#include "../Texture/Texture.hpp"
 
 using namespace std;
 using namespace glm;			// For vectors
-using namespace nuke::tex;		// For texture
-using namespace nuke::shape;	// For shapes
+using namespace gfx::tex;		// For texture
+using namespace gfx::shape;		// For shapes
 
 
-namespace nuke {
+namespace gfx {
 	namespace part {
-		/**
-		 *  \struct Definition of a particle.
+		/*
+		 * ================================================================
+		 * Struct		: Particle
+		 *
+		 * Description	: Particle struct which defines the attributes a 
+		 *				  particle can have.
+		 * ================================================================
 		 */
-		struct Particle 
+		struct gfxParticle 
 		{
-			vec3 pos;			/**< Particle position. */
-			vec3 velocity;		/**< Particle velocity. */
-			vec4 color;			/**< Particle color.	*/
-			float life;			/**< Particle life.		*/
-			uint texture;	    /**< Particle texture index in particles textures vector. */
-			Shape shape;		/**< Particle shape, which requires a shape type and size. */
+			vec3	 pos;			// Particle position
+			vec3	 velocity;		// Particle velocity
+			vec4	 color;			// Particle color.	
+			float	 life;			// Particle life.		
+			uint	 texture;	    // Particle texture handle
+			gfxShape shape;			// Particle gfxShape
 		};
-	}	// End namespace part
-}		// End namespace nuke
+	}			// End namespace part
+}				// End namespace nuke
 
-#endif // __NUKE_PARTICLE__
+#endif			// __GFX_PARTICLE__
