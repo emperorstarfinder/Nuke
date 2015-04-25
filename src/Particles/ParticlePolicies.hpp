@@ -88,7 +88,7 @@ namespace nuke {
 
 		/*------ ----- ---- --- -- - Initializer Policies - -- --- ---- ----- ------*/
 
-		/**
+		y/**
 		 *  \class Initialize policy class used to initialize the life of a particle.
 		 */
 		template <class ParticleType>
