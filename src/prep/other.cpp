@@ -33,7 +33,7 @@ int fp;						// If 'F' is pressed
 
 GLfloat rotX, rotY, rotZ;			// Angles and speeds of rotation
 GLfloat z = -5.0f;					// Depth into the screen
-Textures textureArray;
+gfxTextures textureArray;
 GLuint blend;						// Turn the blending on or off
 
 GLuint cube = 1000;						// Storage for the display list
@@ -76,7 +76,7 @@ void particleConfig()
 void initGL(int width, int height)
 {
 	//particleConfig();
-	textureArray.append({"textures/Crate.bmp"});
+	textureArray.Append({"textures/Crate.bmp"});
 	BuildList(DrawableShape::CUBE, cubeSize, &cube);				//
 	glEnable(GL_TEXTURE_2D);					// Enable texture mapping
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);		// Black background

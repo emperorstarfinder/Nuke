@@ -23,6 +23,7 @@ TEST_EXE_NAME = nuke-lin-tests
 
 BUILD_DIR 	= builds
 SRC_DIR		= src/nuke
+OTH_DIR 	= src/prep
 TST_DIR 	= tests
 
 ###########################################
@@ -46,7 +47,7 @@ OTH_MODULES  = other.cpp
 COM_SOURCES  = $(addprefix $(SRC_DIR)/,$(COM_MODULES))
 TST_SOURCES  = $(addprefix $(TST_DIR)/,$(TST_MODULES))
 TGT_SOURCES  = $(addprefix $(SRC_DIR)/,$(TGT_MODULES))
-OTH_SOURCES  = $(addprefix $(SRC_DIR)/,$(OTH_MODULES))
+OTH_SOURCES  = $(addprefix $(OTH_DIR)/,$(OTH_MODULES))
 
 ##########################################
 #				DIRECTORIES 			 #
@@ -81,7 +82,7 @@ WXX			= x86_64-w64-mingw32-g++
 CXX_FLAGS 	= -g -O3 -std=c++11
 WXX_FLAGS   =
 
-.PHONY: all nuke nuketests
+.PHONY: all nuke other nuketests
 
 # No win or tests till this works (may be a while)
 all: nuke other

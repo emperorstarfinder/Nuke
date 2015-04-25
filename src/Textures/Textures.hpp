@@ -48,7 +48,7 @@ namespace nuke {
 				 *					  variables to be be NULL.
 				 * ============================================================================
 				 */
-				explicit glxTextures() throw() : textures(0), textureInfo(0) {}
+				explicit gfxTextures() throw() : textures(0), textureInfo(0) {}
 
 				/*
 				 * =============================================================================

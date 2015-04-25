@@ -61,16 +61,17 @@ namespace nuke {
 			public:
 				/*
 				 * ==========================================================
-				 * Function		: Default Texture constructor.
+				 * Function		: gfxTexture
 				 *
-				 * Description	: Initializes Texture variables.
+				 * Description	: Default constructor, initializes Texture 
+				 *				  variables.
 				 * ==========================================================
 				 */
-				explicit Texture() throw() : sizeX(0), sizeY(0), data(NULL) {}
+				explicit gfxTexture() throw() : sizeX(0), sizeY(0), data(NULL) {}
 
 				/* 
 				 * ==========================================================
-				 * Function		: Texture Constructor.
+				 * Function		: gfxTexture
 				 *
 				 * Description	: Loads the image at the location provided by
 				 *				  the filename as a Texture.
@@ -87,17 +88,17 @@ namespace nuke {
 				 *						Type = Image file type
 				 * ==========================================================
 				 */
-				explicit Texture(const char* filename) throw();
+				explicit gfxTexture(const char* filename) throw();
 
 				/* 
 				 * ==========================================================
-				 * Function		: Texture Descructor.
+				 * Function		: ~gfxTexture 
 				 *
 				 * Description	: Frees Texture data when Texture goes out of
 				 *				  scope. 
 				 * ==========================================================
 				 */
-				~Texture() throw() {
+				~gfxTexture() throw() {
 					if (data != NULL) {
 						free(data);
 						data = NULL;
@@ -159,7 +160,7 @@ namespace nuke {
 		 * ==========================================================================
 		 */
 
-		Texture::Texture(const char* file) throw() {
+		gfxTexture::gfxTexture(const char* file) throw() {
 			const char* filetype = strchr(file, '.');	// Get .<filetype>
 			switch (Strtoui(++filetype)) {				// "++" will give <filetype>
 				case Strtoui("bmp"):					// Filetype == bitmap
@@ -172,7 +173,7 @@ namespace nuke {
 			}
 		}
 
-		bool Texture::LoadBitmap(const char* filename) throw() {
+		bool gfxTexture::LoadBitmap(const char* filename) throw() {
 			FILE *file;					// File handle
 			ulong size;					// Image size (in bytes)
 			ulong i;					// Counter
