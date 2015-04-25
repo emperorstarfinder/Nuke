@@ -1,0 +1,1 @@
+`pkg-config --cflags gtk+-2.0` `pkg-config --cflags gtkglext-1.0` `pkg-config --cflags gtkgl-2.0` `pkg-config --cflags gtkmm-2.4`-o test nukegtk.cpp `pkg-config --libs gtk+-2.0` `pkg-config --libs gtkglext-1.0` `pkg-config --libs gtkgl-2.0`  `pkg-config --libs gtkmm-2.4`
