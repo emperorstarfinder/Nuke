@@ -4,12 +4,12 @@
 #include <GL/glut.h>		// Header for the GLUT library
 #include <GL/gl.h>			// Header for the OpenGL32 library
 #include <GL/glut.h>		// Header for the GLu32 library
-#include "../renderer/buildlists.hpp"
+#include "../Render/BuildList.hpp"
 #include "../Textures/Textures.hpp"
 //#include "../particles/Particles.hpp"
 
 using namespace nuke::shape;
-using namespace nuke::rend;
+using namespace gfx::rend;
 using namespace gfx::tex;
 //using namespace nuke::part;
 

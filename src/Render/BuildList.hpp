@@ -1,6 +1,6 @@
 /*
- *  Build lists for rendering class for Nuke. Defines simple shapes which
- *  are compiled by OpenGL so that theey run faster.
+ *  Build lists for file for bulding custom shapes. Defines simple 
+ *  shapes which are compiled by OpenGL so that theey run faster.
  *
  *  Copyright (C) 2015 Rob Clucas robclu1818@gmail.com
  *
@@ -19,8 +19,8 @@
  *	Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#ifndef __NUKE_RENDERER_BUILDLISTS__
-#define __NUKE_RENDERER_BUILDLISTS__
+#ifndef __GFX_RENDERER_BUILDLISTS__
+#define __GFX_RENDERER_BUILDLISTS__
 
 #include <GL/gl.h>				// OpenGL
 #include "../shape/shape.hpp"	// Shapes
@@ -28,13 +28,19 @@
 using namespace glm;
 using namespace nuke::shape;	// For DrawableShape
 
-namespace nuke {
+namespace gfx {
 	namespace rend {
-		/** Function to generate a cube of a specific size that is compiled by
-		 * OpenGL so that it's faster.
+		/*
+		 * =================================================================================
+		 * Function			: CubeList
 		 *
-		 * @param _size The size of each side of the cube.
-		 * @aram  _listPointer The integer used to create the list
+		 * Description		: Compile a cube of a specific sizze for OpenGL.
+		 *
+		 * Params			: _size			: A 3 dimensional vector where each
+		 *									  dimension is the length of the size of the 
+		 *									  cube.
+		 *					: listPointer	: A pointer to the GLuint handle for the cube.
+		 * ==================================================================================
 		 */
 		GLvoid CubeList(const vec3& _size, GLuint* listPointer)
 		{
@@ -101,15 +107,19 @@ namespace nuke {
 			glEndList();	// End list
 		}
 
-		/** Function to determine which buildlist to create and then to call the
-		 * relevant function. 
+		/*
+		 * =====================================================================================================
+		 * Function			: BuildList 
 		 *
-		 * @param _size The size of the object to build.
-		 * @param listPointer A pointer to the build list.
+		 * Description		: Builds a list for the given shape.
+		 *
+		 * Params			: shape			: The shape that the list should build.
+		 *					: listPointer	: A pointer to the GLuint handle for the built list.
+		 * ====================================================================================================
 		 */
 		GLvoid BuildList(DrawableShape shape, const vec3& size, GLuint* listpointer)
 		{
-			// Check which shape list function must be called
+			// Check which build list function must be called
 			switch (shape) {
 				case CUBE:
 					CubeList(size, listpointer);
@@ -120,6 +130,6 @@ namespace nuke {
 			}
 		}	
 	}	// End namespace rend
-}		// End namespace nuke
+}		// End namespace gfx
 
-#endif	// __NUKE_RENDERER_BUILDLISTS__
+#endif	// __GFX_RENDERER_BUILDLISTS__
