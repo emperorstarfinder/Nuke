@@ -24,6 +24,7 @@
 #include <sstream>
 #include <iostream>
 #include <string.h>
+#include <stdio.h>
 #include "textureutils.hpp"
 
 typedef unsigned long ulong;
@@ -31,10 +32,20 @@ typedef unsigned short int ushorti;
 
 using namespace std;
 
-// Compute hash of string at compile time - thanks to the internet for helping 
-constexpr unsigned int strtoui(const char* str, int hash = 0) 
+/*
+ * =========================================================================
+ * Function		: Strtoui
+ *
+ * Description	:  Compute the hash of a string at compile time, returns 
+ *				   an integer representing the string.
+ *
+ * Params		: str	: String to hash.
+ *				: hash	: Element of str to use.
+ * =========================================================================
+ */ 
+constexpr unsigned int Strtoui(const char* str, int hash = 0) 
 {
-	return !str[hash] ? 5381 : (strtoui(str, hash + 1) * 33) ^ str[hash];
+	return !str[hash] ? 5381 : (Strtoui(str, hash + 1) * 33) ^ str[hash];
 }
 
 namespace nuke {
@@ -42,29 +53,45 @@ namespace nuke {
 		/** Class for storing a texture from various file formats. */
 		class Texture 
 		{
-			private :
-				ulong sizeX;		/**< The size of the texture in the x dimension. */
-				ulong sizeY;		/**< The size of the texture in the y dirextion. */
-				char* data;			/**< The texture data. */
-			
-			public :
-				/** Default constructor for a texture that creates an empty
-				 * texture. */
+			public:
+				/*
+				 * ==========================================================
+				 * Function		: Default Texture constructor.
+				 *
+				 * Description	: Initializes Texture variables.
+				 * ==========================================================
+				 */
 				explicit Texture() throw() : sizeX(0), sizeY(0), data(NULL) {}
 
-				/** Load a texture from a file.
+				/* 
+				 * ==========================================================
+				 * Function		: Texture Constructor.
 				 *
-				 * @param filename The name of the file from which the texture must be loaded in
-				 * the format:
-				 *				<Name><Size>.<Type>
-				 * where :
-				 *			Name = Name of the texture
-				 *			Size = Size in 3 digit format
-				 *			Type = The type of file
+				 * Description	: Loads the image at the location provided by
+				 *				  the filename as a Texture.
+				 *
+				 * Params		: filename : The name of the file to get the 
+				 *							 Texture information from.
+				 *
+				 * Additional	: The filename should be specified in the
+				 *				  following	format : <Dir><Name><Size>.<Type>
+				 *				  where :
+				 *					
+				 *						Name = Texture name
+				 *						Size = 3 digits giving texture width
+				 *						Type = Image file type
+				 * ==========================================================
 				 */
 				explicit Texture(const char* filename) throw();
 
-				/** Descructor, frees memory on exit. */
+				/* 
+				 * ==========================================================
+				 * Function		: Texture Descructor.
+				 *
+				 * Description	: Frees Texture data when Texture goes out of
+				 *				  scope. 
+				 * ==========================================================
+				 */
 				~Texture() throw() {
 					if (data != NULL) {
 						free(data);
@@ -72,60 +99,75 @@ namespace nuke {
 					}
 				}
 
-				/** Returns the size of the texture's x dimension.
+				/*
+				 * ===========================================================
+				 * Function		: SizeX
 				 *
-				 * @return The size of the x dimension of the texture.
+				 * Description	: Returns the size (number of pixels) in the x
+				 *				  direction of the Texture (width).
+				 * ===========================================================
 				 */
 				inline ulong SizeX() const { return sizeX; }
-
-				/** Returns the size of the texture's y dimension.
+	
+				/*
+				 * ===========================================================
+				 * Function		: SizeY
 				 *
-				 * @return The size of the y dimension (height) of the texture.
+				 * Description	: Returns the size (number of pixels) in the y
+				 *				  direction of the Texture (height).
+				 * ===========================================================
 				 */
 				inline ulong SizeY() const { return sizeY; }
 
-				/** Returns the texture data.
+				/*
+				 * ===========================================================
+				 * Function		: Data
 				 *
-				 * @return A pointer to the texture data.
+				 * Description	: Returns a pointer to the Texture data.
+				 * ===========================================================
 				 */
 				inline char* Data() const { return data; }
 
-			private :
-				/** Function to load a texture from a bitmap.
+			private:
+				ulong sizeX;		// Texture x dimension size in pixels (width) 
+				ulong sizeY;		// Texture y dimension size in pixels (height) 
+				char* data;			// Pointer to the Texture data
+
+			private:
+				/* 
+				 * ===========================================================
+				 * Function		: LoadBitmap
 				 *
-				 * @param filename The name of the file to get the texture from.
-				 * @return If the texture was loaded from the bitmap.
+				 * Description	: Loads a bitmap image into a Texture object,
+				 *				  returns if the Texture was loaded.
+				 *
+				 * Params		: filename : The name of bitmap image file to 
+				 *							 load as a Texture.
+				 * ============================================================
 				 * */
-				bool loadBitmap(const char* filename) throw();
+				bool LoadBitmap(const char* filename) throw();
 		};
 
-		// Constructor when given the texture filename
-		Texture::Texture(const char* file) throw() {
-		
-			const char* filetype = strchr(file, '.');		// Get .<filetype>
-			filetype++;										// Get rid of '.'
+		/*
+		 * ========================================================================== 
+		 *								Implementation  
+		 * ==========================================================================
+		 */
 
-			// Use the relevant function for the filetype (using the compile
-			// time hash of the string)
-			switch (strtoui(filetype)) {
-				
-				// Bitmap file
-				case strtoui("bmp"):
-					if (!loadBitmap(file)) {
-						cout << "ERROR T01 : Texture could not be loaded from bitmap file " << file << endl;
+		Texture::Texture(const char* file) throw() {
+			const char* filetype = strchr(file, '.');	// Get .<filetype>
+			switch (Strtoui(++filetype)) {				// "++" will give <filetype>
+				case Strtoui("bmp"):					// Filetype == bitmap
+					if (!LoadBitmap(file)) {
+						printf("ERROR T01 : Texture could not be loaded from bitmap file %s\n", file);
 					}
 					break;
-
 				default:
 					break;
-
-				}
+			}
 		}
 
-		// Function that loads a texture from a bitmap
-		// See here for more info on bitmaps :
-		// http://www.dcs.ed.ac.uk/~mxr/gfx/2d/BMP.txt 
-		bool Texture::loadBitmap(const char* filename) throw() {
+		bool Texture::LoadBitmap(const char* filename) throw() {
 			FILE *file;					// File handle
 			ulong size;					// Image size (in bytes)
 			ulong i;					// Counter
