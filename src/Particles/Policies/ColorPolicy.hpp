@@ -21,6 +21,11 @@
 #ifndef __GFX_PARTICLE_COLOR_POLICY__
 #define __GFX_PARTICLE_COLOR_POLICY__
 
+#include <glm/vec4.hpp>
+
+using namespace std;
+using namespace glm;
+
 namespace gfx {
 	namespace part {
 		/*
