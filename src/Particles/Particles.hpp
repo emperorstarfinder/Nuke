@@ -21,13 +21,13 @@
 #ifndef __GFX_PARTICLES__
 #define __GFX_PARTICLES__
 
-#include "ParticlePolicies.hpp"
+#include "Particle.h"
 #include "../Texture/Textures.hpp"
 #include "../Render/BuildList.hpp"		// For creating build lists
 #include "../Shape/Shape.hpp"			// For Shape class
 
 using namespace gfx::tex;				// For Textures class
-using namespace gfx::shape;			// For Shape and ShapeHash
+using namespace gfx::shape;				// For Shape and ShapeHash
 using namespace gfx::rend;				// For BuildList
 
 namespace gfx {
@@ -40,7 +40,7 @@ namespace gfx {
 		 *				  gfxParticle objects. 
 		 * ===================================================================
 		 */
-		template<size_t size,			  class ParticleType, 
+		template<size_t size            , class ParticleType, 
 				 class InitializerPolicy, class ActionPolicy>
 		class gfxParticles
 		{
@@ -119,7 +119,7 @@ namespace gfx {
 				 * ============================================================
 				 */
 				inline void AddTextures( initializer_list<const char*> texNames ) throw() {
-					textureArray.append( texNames );
+					textureArray.Append( texNames );
 				}
 
 				/*
@@ -145,7 +145,7 @@ namespace gfx {
 						activeCount += amount;									// Allow for more particles
 						for (; numActive < activeCount; numActive++) {			
 							particleArray[numActive].pos = _position;			
-							initializerPolicy( particleArray[numToAdd] );		// Initialize the particle
+							initializerPolicy( particleArray[numActive] );		// Initialize the particle
 						}
 					}
 				}

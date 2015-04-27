@@ -23,10 +23,10 @@
 #define __GFX_RENDERER_BUILDLISTS__
 
 #include <GL/gl.h>				// OpenGL
-#include "../shape/shape.hpp"	// Shapes
+#include "../Shape/Shape.hpp"	// Shapes
 
 using namespace glm;
-using namespace nuke::shape;	// For DrawableShape
+using namespace gfx::shape;		// For DrawableShape
 
 namespace gfx {
 	namespace rend {
@@ -117,7 +117,7 @@ namespace gfx {
 		 *					: listPointer	: A pointer to the GLuint handle for the built list.
 		 * ====================================================================================================
 		 */
-		GLvoid BuildList(DrawableShape shape, const vec3& size, GLuint* listpointer)
+		GLvoid BuildList(DrawableShapes shape, const vec3& size, GLuint* listpointer)
 		{
 			// Check which build list function must be called
 			switch (shape) {

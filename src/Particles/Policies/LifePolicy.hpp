@@ -106,7 +106,7 @@ namespace gfx {
 				 *				  decaying very slowly. 
 				 * ===========================================================
 				 */
-				explicit LifeAction() throw() : decayRate( 0.001f ) {}
+				explicit gfxLifeAction() throw() : decayRate( 0.001f ) {}
 
 				/*
 				 * ===========================================================

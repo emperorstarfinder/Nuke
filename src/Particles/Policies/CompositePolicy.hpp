@@ -64,7 +64,7 @@ namespace gfx {
 					Policy1::operator()(particle);
 					Policy2::operator()(particle);
 				}
-		}
+		};
 	}			// End namespace part
 }				// End namespace gfx
 

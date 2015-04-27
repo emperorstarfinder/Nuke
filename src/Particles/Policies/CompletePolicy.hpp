@@ -21,7 +21,7 @@
 #ifndef __GFX_PARTICLE_COMPLETE_POLICY__
 #define __GFX_PARTICLE_COMPLETE_POLICY__
 
-#include "Particle.h"
+#include "../Particle.h"
 #include "ColorPolicy.hpp"
 #include "LifePolicy.hpp"
 #include "MovementPolicy.hpp"
@@ -45,12 +45,12 @@ namespace gfx {
 		 *				  new policy and add it here in the same format.
 		 * =====================================================================
 		 */
-		template <class ParticleType, class LifePolicy	 , class ColorPolicy	,
-				  class ShapePolicy	, class TexturePolicy, class VelocityPolicy	, 
-				  class MovementPolicy>
-		class CompletePolicy
+		template <class ParticleType	, class gfxLifePolicy		, class gfxColorPolicy		,
+				  class gfxShapePolicy	, class gfxTexturePolicy	, class gfxVelocityPolicy	, 
+				  class gfxMovementPolicy>
+		class gfxCompletePolicy
 		{
-			public :
+			public:
 				gfxLifePolicy		lifePolicy;			// Life policy for the particles
 				gfxColorPolicy		colorPolicy;		// Color policy for the particles	 
 				gfxShapePolicy		shapePolicy;		// Size policy for the particles
@@ -94,6 +94,7 @@ namespace gfx {
 					velocityPolicy( particle );			// Perform velocity related actions
 					movementPolicy( particle );			// Move the particle
 				}
+		};		
 	}			// End namespace gfx
 }				// End namespace part
 

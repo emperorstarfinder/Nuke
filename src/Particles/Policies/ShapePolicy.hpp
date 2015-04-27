@@ -22,7 +22,7 @@
 #define __GFX_PARTICLE_SHAPE_POLICY__
 
 #include <glm/vec3.hpp>
-#include "../Shape/Shape.hpp"
+#include "../../Shape/Shape.hpp"
 
 using namespace std;
 using namespace glm;
@@ -53,7 +53,7 @@ namespace gfx {
 				 *				  as the defualt shape, with unit volume
 				 * ============================================================
 				 */
-				explicit ShapeInitializer() throw() : 
+				explicit gfxShapeInitializer() throw() : 
 					type( DrawableShapes::CUBE ), size( vec3( 1.f, 1.f, 1.f ) ) {}
 
 				/*

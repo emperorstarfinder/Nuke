@@ -4,14 +4,15 @@
 #include <GL/glut.h>		// Header for the GLUT library
 #include <GL/gl.h>			// Header for the OpenGL32 library
 #include <GL/glut.h>		// Header for the GLu32 library
-#include "../renderer/buildlists.hpp"
-#include "../texture/textures.hpp"
-#include "../particles/Particles.hpp"
+#include "../Render/BuildList.hpp"
+#include "../Texture/Textures.hpp"
+#include "../Particles/Particles.hpp"
+#include "../Particles/ParticleTypedefs.h"
+#include "../Particles/ParticleSimulations.hpp"
 
-using namespace nuke::shape;
-using namespace nuke::rend;
-using namespace nuke::tex;
-using namespace nuke::part;
+using namespace gfx::rend;
+using namespace gfx::tex;
+using namespace gfx::part;
 
 vec3 cubeSize(2.0f, 2.0f, 2.0f);
 
@@ -24,7 +25,7 @@ vec3 cubeSize(2.0f, 2.0f, 2.0f);
 #define LEFT_ARROW	75			
 #define RIGHT_ARROW	77			
 
-const int NUM_PARTICLES = 2;
+const int NUM_PARTICLES = 160;
 
 int window;				    // Number of the GLUT window
 int light;					// Lighting (1 = ON, 0 = OFF)
@@ -33,7 +34,7 @@ int fp;						// If 'F' is pressed
 
 GLfloat rotX, rotY, rotZ;			// Angles and speeds of rotation
 GLfloat z = -5.0f;					// Depth into the screen
-Textures textureArray;
+gfxTextures textureArray;
 GLuint blend;						// Turn the blending on or off
 
 GLuint cube = 1000;						// Storage for the display list
@@ -43,24 +44,24 @@ GLuint yloop;						// Loop for the y axis
 
 // Define the particles to use for the visual test
 // Initially the particles will be drawn without a texture
-Particles<NUM_PARTICLES, Particle, ParticleInitializer, ParticleAction> particles;
+gfxParticles<NUM_PARTICLES, gfxParticle, ParticleInitializer, ParticleAction> particles;
 
 void particleConfig()
 {
-	particles.initializerPolicy.velocityPolicy.SetVelocity(vec3(0.002f, 0.003f, 0.f));	// Set their velocity
-	particles.initializerPolicy.shapePolicy.SetSize(vec3(0.5f, 0.5f, 0.5f));		    // Set their size
-	particles.initializerPolicy.colorPolicy.SetColor(vec4(0.5f, 1.0f, 1.0f, 1.0f));		// Set the color
+	particles.initializerPolicy.velocityPolicy.SetVelocity( vec3(0.002f, 0.003f, 0.f ) );	// Set their velocity
+	particles.initializerPolicy.shapePolicy.SetSize( vec3( 0.5f, 0.5f, 0.5f ) );		    // Set their size
+	particles.initializerPolicy.colorPolicy.SetColor( vec4( 0.5f, 1.0f, 1.0f, 1.0f ) );		// Set the color
 
-	// Emit NUM_PARTICLES at the origin
-	particles.Emit(1, vec3(0.f, 0.f, -6.f)); 
+	// Emit 1 particle at the origin
+	particles.Emit( 1, vec3( 0.f, 0.f, -6.f ) ); 
 
-	particles.initializerPolicy.velocityPolicy.SetVelocity(vec3(-0.002, -0.003, -0.1));
-	particles.initializerPolicy.shapePolicy.SetSize(vec3(0.5f, 0.5f, 0.5f));		    // Set their size
-	particles.initializerPolicy.colorPolicy.SetColor(vec4(0.0f, 1.0f, 0.0f, 0.2f));		// Set the color
-	particles.Emit(1, vec3(-0.3, 0.f, -4.f));
+	particles.initializerPolicy.velocityPolicy.SetVelocity (vec3( -0.002f, -0.003f, -0.1f ) );
+	particles.initializerPolicy.shapePolicy.SetSize( vec3( 0.5f, 0.5f, 0.5f ) );		    // Set their size
+	particles.initializerPolicy.colorPolicy.SetColor( vec4( 0.0f, 1.0f, 0.0f, 0.2f ) );		// Set the color
+	particles.Emit( 1, vec3( -0.3, 0.f, -4.f ) );
 
 	// Load a texture for the particles (REQUIRED)
-	particles.BindTextures({"textures/Cube.bmp"});
+	particles.AddTextures( {"textures/Cube.bmp"} );
 
 	// Build the shapes for the particles
 	particles.BuildShapes();
@@ -69,49 +70,50 @@ void particleConfig()
 // General OpenGL init. Sets all initial params
 void initGL(int width, int height)
 {
-	particleConfig();
-	glEnable(GL_TEXTURE_2D);					// Enable texture mapping
-	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);		// Black background
-	glClearDepth(1.0);							// Allows depth buffer to be cleared
-	glDepthFunc(GL_LESS);						// The type of depth test
-	glEnable(GL_DEPTH_TEST);					// Enables depth testing
-	glShadeModel(GL_SMOOTH); 					// Enables smoothe color shading 
+	BurstSimulationSetup(particles);
+	glEnable( GL_TEXTURE_2D );					// Enable texture mapping
+	glClearColor( 0.0f, 0.0f, 0.0f, 0.0f );		// Black background
+	glClearDepth( 1.0 );						// Allows depth buffer to be cleared
+	glDepthFunc( GL_LESS );						// The type of depth test
+	glEnable( GL_DEPTH_TEST );					// Enables depth testing
+	glShadeModel( GL_SMOOTH ); 					// Enables smoothe color shading 
 
 	glMatrixMode(GL_PROJECTION);				// Type of GL Matrix
 	glLoadIdentity();							// Reset the projection matrix
 
 	// Calculate the aspect ratio of the window
-	gluPerspective(45.f, (GLfloat)width / (GLfloat)height, 0.1f, 100.0f);
+	gluPerspective( 45.f, (GLfloat)width / (GLfloat)height, 0.1f, 100.0f );
 
-	glMatrixMode(GL_MODELVIEW);					// Back to model view matrix
+	glMatrixMode( GL_MODELVIEW );					// Back to model view matrix
 
 	// Setup a light
-	glEnable(GL_LIGHT0);
-	glEnable(GL_LIGHTING);
-	glEnable(GL_COLOR_MATERIAL);
+	glEnable( GL_LIGHT0 );
+	glEnable( GL_LIGHTING );
+	glEnable( GL_COLOR_MATERIAL );
 }
 
 // Resize window if (for some reason) the size is changed
-void resizeGlScene(int width, int height)
+void resizeGlScene( int width, int height )
 {
-	if (height == 0)					// Prevent div by 0 and udef behaviour
+	if ( height == 0 )	{				// Prevent div by 0 and udef behaviour
 		height = 1;
+	}
 
-	glViewport(0, 0, width, height);	// Reset current viewport and perspective
+	glViewport( 0, 0, width, height );	// Reset current viewport and perspective
 
-	glMatrixMode(GL_PROJECTION);		// Tell GL we want to operate on perspective 
+	glMatrixMode( GL_PROJECTION );		// Tell GL we want to operate on perspective 
 	glLoadIdentity();					// Reset perspective matrix
 
 	// Calculate the aspect ratio of the window
-	gluPerspective(45.f, (GLfloat)width / (GLfloat)height, 0.1f, 100.0f);
-	glMatrixMode(GL_MODELVIEW);			// Back to model view matrix
+	gluPerspective( 45.f, (GLfloat)width / (GLfloat)height, 0.1f, 100.0f );
+	glMatrixMode( GL_MODELVIEW );			// Back to model view matrix
 }
 
 // Main OpenGL drawing function 
 void drawGlScene()
 {
 	// Clear the color and the depth buffers 
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);	
+	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );	
 	
 	// Draw the particles to the screen
 	particles.Draw();
@@ -125,13 +127,13 @@ void drawGlScene()
 }
 
 // Function that will check for exit, lighting, and filter
-void keyPressed(unsigned char key, int x, int y)
+void keyPressed( unsigned char key, int x, int y )
 {
-	usleep(100);	// No funny behaviour when key presses are too fast
+	usleep( 100 );	// No funny behaviour when key presses are too fast
 
-	switch(key) {
+	switch( key ) {
 		case ESCAPE:						// Close the program
-			glutDestroyWindow(window);		// Destroy the GLUT window
+			glutDestroyWindow( window );		// Destroy the GLUT window
 			exit(0);
 			break;
 
@@ -141,12 +143,12 @@ void keyPressed(unsigned char key, int x, int y)
 }
 
 // Function for dealing with the movement
-void specialKeyPressed(int key, int x, int y)
+void specialKeyPressed( int key, int x, int y )
 {
 	// Aviod thrashing the key
-	usleep(100);
+	usleep( 100 );
 
-	switch (key) {
+	switch ( key ) {
 		case GLUT_KEY_UP:
 				rotX -= 1.f;
 				break;
@@ -164,50 +166,50 @@ void specialKeyPressed(int key, int x, int y)
 				break;
 
 		default:
-				printf("Special key pressed, but no action yet");
+				printf( "Special key pressed, but no action yet" );
 				break;
 	}
 }
 
-int main(int argc, char **argv) 
+int main( int argc, char **argv ) 
 {
 	// Init GLUT state. GLUT will take any command line  
 	// args that pertain to either it or to X windows 
-	glutInit(&argc, argv);		
+	glutInit( &argc, argv );		
 
 	// Select the display mode for GLUT
 	// [RGBA, Double buffer, Alpha channel enabled, Depth buffer]
-	glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_ALPHA | GLUT_DEPTH);
+	glutInitDisplayMode( GLUT_RGBA | GLUT_DOUBLE | GLUT_ALPHA | GLUT_DEPTH );
 
 	// Define a 640 x 480 window
-	glutInitWindowSize(640, 480);
+	glutInitWindowSize( 640, 480 );
 
 	// Make the window co-ords be top left of screen
-	glutInitWindowPosition(0, 0);
+	glutInitWindowPosition( 0, 0 );
 
 	// Open a window
-	window = glutCreateWindow("VoxSim V0.1 =D");
+	window = glutCreateWindow( "GFX Test =D" );
 
 	// OpenGL drawing function init
-	glutDisplayFunc(&drawGlScene);
+	glutDisplayFunc( &drawGlScene );
 
 	// Now make the window fullscreen (prev stuff must be done first)
 	glutFullScreen();
 
 	// Redraw the gl scene regardless of the presence of gl events
-	glutIdleFunc(&drawGlScene);
+	glutIdleFunc( &drawGlScene );
 
 	// Init the function called when resizing the screen
-	glutReshapeFunc(&resizeGlScene);
+	glutReshapeFunc( &resizeGlScene );
 
 	// Register the keyboard checking function
-	glutKeyboardFunc(&keyPressed);
+	glutKeyboardFunc( &keyPressed );
 
 	// Check for the special keys
-	glutSpecialFunc(&specialKeyPressed);
+	glutSpecialFunc( &specialKeyPressed );
 	
 	// Init GL - the window
-	initGL(640, 480);
+	initGL( 640, 480 );
 
 	// Start the event loop
 	glutMainLoop();

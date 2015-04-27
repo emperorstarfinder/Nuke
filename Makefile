@@ -5,10 +5,10 @@
 #										  #		
 ###########################################
 
-EXE_LINUX 	  = nuke-lin
-EXE_WINDW 	  = nuke-win
+EXE_LINUX 	  = gfx-lin
+EXE_WINDW 	  = gfx-win
 EXE_OTH		  = other
-TEST_EXE_NAME = nuke-lin-tests
+TEST_EXE_NAME = gfx-lin-tests
 
 ###########################################
 # 			DIRECTORIES					  #
@@ -22,7 +22,7 @@ TEST_EXE_NAME = nuke-lin-tests
 ###########################################
 
 BUILD_DIR 	= builds
-SRC_DIR		= src/nuke
+SRC_DIR		= src/Main
 OTH_DIR 	= src/prep
 TST_DIR 	= tests
 
@@ -41,7 +41,7 @@ TEST_EXE 	= $(addprefix $(BUILD_DIR)/,$(TEST_EXE_NAME))
 
 COM_MODULES  = 
 TST_MODULES  = tests.cpp
-TGT_MODULES  = nuke.cpp
+TGT_MODULES  = mainglut.cpp			# maingtk.cpp
 OTH_MODULES  = other.cpp
 
 COM_SOURCES  = $(addprefix $(SRC_DIR)/,$(COM_MODULES))
@@ -82,12 +82,12 @@ WXX			= x86_64-w64-mingw32-g++
 CXX_FLAGS 	= -g -O3 -std=c++11
 WXX_FLAGS   =
 
-.PHONY: all nuke other nuketests
+.PHONY: all gfx other gfxtests
 
 # No win or tests till this works (may be a while)
-all: nuke other
+all: gfx other
 
-nuke: $(EXE_LIN)
+gfx: $(EXE_LIN)
 
 other: $(EXE_OTHER)
 

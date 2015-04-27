@@ -24,6 +24,8 @@
 #include "Policies/CompletePolicy.hpp"	
 #include "Policies/CompositePolicy.hpp"		// For composing policies
 
+using namespace gfx::part;
+
 namespace gfx {
 	namespace part {
 		/*
@@ -34,13 +36,13 @@ namespace gfx {
 		 *				  simple particle
 		 * =============================================================
 		 */
-		typedef CompletePolicy< gfxParticle							,	// Particle type
-								gfxLifeInitializer<gfxParticle>		,	// Life initializer
-								gfxColorInitializer<gfxParticle>	,	// Color initializer
-								gfxShapeInitializer<gfxParticle>	,	// Shape initializer
-								gfxTextureInitializer<gfxParticle>	,	// Texture initializer
-								gfxVelocityInitializer<gfxParticle> ,	// Velocity initializer
-								gfxNullPolicy<gfxParticle>			>	// Movement initializer
+		typedef gfxCompletePolicy< gfxParticle							,	// Particle type
+								   gfxLifeInitializer<gfxParticle>		,	// Life initializer
+								   gfxColorInitializer<gfxParticle>		,	// Color initializer
+								   gfxShapeInitializer<gfxParticle>		,	// Shape initializer
+								   gfxTextureInitializer<gfxParticle>	,	// Texture initializer
+								   gfxVelocityInitializer<gfxParticle>	,	// Velocity initializer
+								   gfxNullPolicy<gfxParticle>			>	// Movement initializer
 								ParticleInitializer;
 
 	
@@ -52,13 +54,13 @@ namespace gfx {
 		 *				  particle.
 		 * ============================================================
 		 */
-		typedef CompletePolicy< gfxParticle							,	// Particle type
-								gfxLifeAction<gfxParticle>			,	// Life action
-								gfxNullPolicy<gfxParticle>			,	// Color action
-								gfxNullPolicy<Particle>				,	// Shape action
-								NullPolicy<Particle>				,	// Texture action
-								NullPolicy<Particle>				,	// Velocity action
-								MoveAction<Particle>				>   // Movement action
+		typedef gfxCompletePolicy< gfxParticle							,	// Particle type
+								   gfxLifeAction<gfxParticle>			,	// Life action
+								   gfxNullPolicy<gfxParticle>			,	// Color action
+								   gfxNullPolicy<gfxParticle>			,	// Shape action
+								   gfxNullPolicy<gfxParticle>			,	// Texture action
+								   gfxNullPolicy<gfxParticle>			,	// Velocity action
+								   gfxMoveAction<gfxParticle>			>   // Movement action
 								ParticleAction;	
 	}	// End namespace part
 }		// End namepsace gfx

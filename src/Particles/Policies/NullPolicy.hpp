@@ -63,4 +63,8 @@ namespace gfx {
 				 */
 				inline void operator() ( ParticleType& particle ) const throw() {}
 		};
+	}			// End namespace part
+}				// End namespace gfx
+
+#endif			// __GFX_PARTICLE_NULL_POLICY__
 	
