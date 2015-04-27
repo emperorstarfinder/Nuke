@@ -1,6 +1,6 @@
 /*
- *  Particle simulation file for simulating a bust of 
- *  particles moving awaay from the origin.
+ *  Particle simulation file for setting up a particle
+ *  groups to behave in some way.
  *
  *  Copyright (C) 2015 Rob Clucas robclu1818@gmail.com
  *
@@ -19,8 +19,8 @@
  *	Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#ifndef __GFX_PARTICLE_BURST_SIMULATION__
-#define __GFX_PARTICLE_BURST_SIMULATION__
+#ifndef __GFX_PARTICLE_SIMULATIONS__
+#define __GFX_PARTICLE_SIMULATIONS__
 
 #include <math.h>
 #include <glm/vec3.hpp>
@@ -56,10 +56,14 @@ namespace gfx {
 			particles.initializerPolicy.shapePolicy.SetSize( vec3(0.1f, 0.1f, 0.1f) );
 
 			for ( size_t i = 0; i < numParticles; i++ ) {
-				// Determine velocites
+				// Determine the angle of the particle
 				theta = 2 * 3.1415f / numParticles * i;
+
+				// Get X and y using theta
 				velX = mag * cos( theta );
 				velY = sqrt( ( mag * mag ) - ( velX * velX ) );
+
+				// Swap velocites for second half of array
 				if ( i > (numParticles / 2 ) ) {
 					velX *= -1.f;
 					velY *= -1.f;
@@ -67,14 +71,14 @@ namespace gfx {
 				}	
 
 				// Determine colors
-				if		( i <  ( numParticles / 3 ) )		 {
+				if		( i <  ( numParticles / 3 ) )        {
 					colB = 0.f; colG = 0.f;
-				   	colR += ( 1.f / ( numParticles / 3 ) );
+				   	colR += ( 1.f / ( numParticles / 3 ) );		// Change redness
 				} else if ( i <  ( numParticles / 3 * 2 ) )  {
-					colR = 0.f; colB = 0.f;
+					colR = 0.f; colB = 0.f;						// Change greenness
 					colG += ( 1.f / ( numParticles / 3 ) );
 				} else if ( i >= ( numParticles / 3 * 2 ) )	 {
-					colR = 0.f; colG = 0.f;
+					colR = 0.f; colG = 0.f;						// Change blueness
 					colB += ( 1.f / ( numParticles / 3 ) );
 				}
 
@@ -82,7 +86,7 @@ namespace gfx {
 				particles.initializerPolicy.colorPolicy.SetColor( vec4( colR, colG, colB, 1.0f ) );		// Set the color
 
 				// Emit the particle at the x,y origin but into the screen
-				particles.Emit( 1, vec3( 0.f, 0.f, -12.f ) ); 
+				particles.Emit( 1, vec3( 0.f, 0.f, -22.f ) ); 
 			}
 
 			// Load a texture for the particles 
@@ -94,4 +98,4 @@ namespace gfx {
 	}		// End namespace part
 }			// End namespace gfx
 
-#endif		// __GFX_PARTICLE_BURST_SIMULATION__
+#endif		// __GFX_PARTICLE_SIMULATIONS__
