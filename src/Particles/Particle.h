@@ -44,6 +44,7 @@ namespace gfx {
 		struct gfxParticle 
 		{
 			vec3	 pos;			// Particle position
+			vec3	 acceleration;	// Particle acceleration
 			vec3	 velocity;		// Particle velocity
 			vec4	 color;			// Particle color.	
 			float	 life;			// Particle life.		

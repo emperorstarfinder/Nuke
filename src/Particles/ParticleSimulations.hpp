@@ -53,7 +53,7 @@ namespace gfx {
 			size_t numParticles = particles.MaxParticles();
 
 			// initialize the size of the particles
-			particles.initializerPolicy.shapePolicy.SetSize( vec3(0.1f, 0.1f, 0.1f) );
+			particles.initializerPolicy.shapePolicy.SetSize( vec3(0.3f, 0.3f, 0.3f) );
 
 			for ( size_t i = 0; i < numParticles; i++ ) {
 				// Determine the angle of the particle

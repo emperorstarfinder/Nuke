@@ -22,6 +22,7 @@
 #define __GFX_PARTICLE_COMPLETE_POLICY__
 
 #include "../Particle.h"
+#include "AccelerationPolicy.hpp"
 #include "ColorPolicy.hpp"
 #include "LifePolicy.hpp"
 #include "MovementPolicy.hpp"
