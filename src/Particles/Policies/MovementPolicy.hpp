@@ -21,7 +21,11 @@
 #ifndef	__GFX_PARTICLE_MOVEMENT_POLICY__
 #define	__GFX_PARTICLE_MOVEMENT_POLICY__
 
+#include <glm/vec3.hpp>
+#include "../../Time/Time.hpp"
+
 using namespace std;
+using namespace glm;
 
 namespace gfx {
 	namespace part {
@@ -51,14 +55,15 @@ namespace gfx {
 				 * Function		: Operator () 
 				 *
 				 * Definition	: Updates the position of a particle by 
-				 *				  adding its velocity.
+				 *				  using the velocity and time change.
 				 *
 				 * Params		: particle	: The particle which must be 
 				 *							  moved.
 				 * =========================================================
 				 */
 				inline void operator() ( ParticleType& particle ) const throw() {
-					particle.pos += particle.velocity;		// 3D elementwise operation 
+					particle.pos += particle.velocity *
+									vec3( gfx::time::DeltaTimef() );		
 				}
 		};	
 	}			// End namespace part

@@ -46,18 +46,19 @@ namespace gfx {
 		 *				  new policy and add it here in the same format.
 		 * =====================================================================
 		 */
-		template <class ParticleType	, class gfxLifePolicy		, class gfxColorPolicy		,
-				  class gfxShapePolicy	, class gfxTexturePolicy	, class gfxVelocityPolicy	, 
-				  class gfxMovementPolicy>
+		template <class ParticleType	 , class gfxLifePolicy		, class gfxColorPolicy		,
+				  class gfxShapePolicy	 , class gfxTexturePolicy	, class gfxVelocityPolicy	, 
+				  class gfxMovementPolicy, class gfxAccelerationPolicy >
 		class gfxCompletePolicy
 		{
 			public:
-				gfxLifePolicy		lifePolicy;			// Life policy for the particles
-				gfxColorPolicy		colorPolicy;		// Color policy for the particles	 
-				gfxShapePolicy		shapePolicy;		// Size policy for the particles
-				gfxTexturePolicy	texturePolicy;		// Texture policy for the particles
-				gfxVelocityPolicy	velocityPolicy;		// Velocity policy for the particles
-				gfxMovementPolicy	movementPolicy;		// Movement policy for the particles
+				gfxLifePolicy			lifePolicy;			// Life policy for the particles
+				gfxColorPolicy			colorPolicy;		// Color policy for the particles	 
+				gfxShapePolicy			shapePolicy;		// Size policy for the particles
+				gfxTexturePolicy		texturePolicy;		// Texture policy for the particles
+				gfxVelocityPolicy		velocityPolicy;		// Velocity policy for the particles
+				gfxMovementPolicy		movementPolicy;		// Movement policy for the particles
+				gfxAccelerationPolicy	accelerationPolicy;	// Acceleration policy for the particles
 
 				/*
 				 * ================================================================
@@ -74,6 +75,7 @@ namespace gfx {
 					texturePolicy.PrepareAction();
 					velocityPolicy.PrepareAction();
 					movementPolicy.PrepareAction();
+					accelerationPolicy.PrepareAction();
 				}
 
 				/*
@@ -94,6 +96,7 @@ namespace gfx {
 					texturePolicy( particle );			// Give the particle a texture to use
 					velocityPolicy( particle );			// Perform velocity related actions
 					movementPolicy( particle );			// Move the particle
+					acclerationPolicy( particle );		// Update the acceleration
 				}
 		};		
 	}			// End namespace gfx

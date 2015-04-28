@@ -36,13 +36,14 @@ namespace gfx {
 		 *				  simple particle
 		 * =============================================================
 		 */
-		typedef gfxCompletePolicy< gfxParticle							,	// Particle type
-								   gfxLifeInitializer<gfxParticle>		,	// Life initializer
-								   gfxColorInitializer<gfxParticle>		,	// Color initializer
-								   gfxShapeInitializer<gfxParticle>		,	// Shape initializer
-								   gfxTextureInitializer<gfxParticle>	,	// Texture initializer
-								   gfxVelocityInitializer<gfxParticle>	,	// Velocity initializer
-								   gfxNullPolicy<gfxParticle>			>	// Movement initializer
+		typedef gfxCompletePolicy< gfxParticle								,	// Particle type
+								   gfxLifeInitializer<gfxParticle>			,	// Life initializer
+								   gfxColorInitializer<gfxParticle>			,	// Color initializer
+								   gfxShapeInitializer<gfxParticle>			,	// Shape initializer
+								   gfxTextureInitializer<gfxParticle>		,	// Texture initializer
+								   gfxVelocityInitializer<gfxParticle>		,	// Velocity initializer
+								   gfxNullPolicy<gfxParticle>				,	// Movement initializer
+								   gfxAccelerationInitializer<gfxParticle>	>
 								ParticleInitializer;
 
 	
@@ -60,7 +61,8 @@ namespace gfx {
 								   gfxNullPolicy<gfxParticle>			,	// Shape action
 								   gfxNullPolicy<gfxParticle>			,	// Texture action
 								   gfxNullPolicy<gfxParticle>			,	// Velocity action
-								   gfxMoveAction<gfxParticle>			>   // Movement action
+								   gfxMoveAction<gfxParticle>			,   // Movement action
+								   gfxAccelerationAction<gfxParticle>	>
 								ParticleAction;	
 	}	// End namespace part
 }		// End namepsace gfx

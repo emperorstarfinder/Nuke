@@ -82,6 +82,42 @@ namespace gfx {
 					particle.acceleration = acceleration;
 				}
 		};
+
+		/*
+		 * =====================================================================
+		 * Class		: gfxAccelerationAction
+		 *
+		 * Description	: Changes the acceleration of the particle o each
+		 *				  iteration.
+		 * =====================================================================
+		 */
+		template <class ParticleType>
+		class gfxAccelerationAction
+		{
+			public:
+				/*
+				 * =============================================================
+				 * Function			: PrepareAction
+				 *
+				 * Description		: Performs any setup for the acceletation
+				 * =============================================================
+				 */
+				inline void PrepareAction() throw() {}
+
+				/*
+				 * =============================================================
+				 * Function			: Operator ()
+				 *
+				 * Description		: Will update the acceleration using the mass
+				 *					  and the force. 
+				 * 
+				 * Params			: particle	: The particle for which the 
+				 *								  acceleration will be updated
+				 * ============================================================
+				 */
+				inline void operator() ( ParticleType& particle ) const throw() {}
+		};
+
 	}			// End namespace part
 }				// End namespace gfx
 

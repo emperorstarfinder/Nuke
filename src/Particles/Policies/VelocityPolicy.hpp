@@ -22,6 +22,7 @@
 #define __GFX_PARTICLE_VELOCITY_POLICY__
 
 #include <glm/vec3.hpp>
+#include "../../Time/Time.hpp"
 
 using namespace std;
 using namespace glm;
@@ -81,7 +82,46 @@ namespace gfx {
 				inline void operator() ( ParticleType& particle ) const throw() {
 					particle.velocity = velocity;
 				}
-		};	
+		};
+
+		/*
+		 * ==================================================================
+		 * Class		: gfxVelocityAction
+		 *
+		 * Description		: Action policy for updating the velocity of a 
+		 *					  particle using the velocity and change in time 
+		 * ==================================================================
+		 */
+		template <class ParticleType>
+		class gfxVelocityAction
+		{
+			public:
+				/*
+				 * =========================================================
+				 * Function		: PrepareAction 
+				 *
+				 * Description	: Performs any necessary setup required for
+				 *				  the movement action
+				 * =========================================================
+				 */
+				inline void PrepareAction() throw() {}
+
+				/*
+				 * =========================================================
+				 * Function		: Operator () 
+				 *
+				 * Definition	: Updates the velocity of a particle using 
+				 *				  its acceleration and the time change.
+				 *
+				 * Params		: particle	: The particle which must have
+				 *							  its velocity updated.
+				 * =========================================================
+				 */
+				inline void operator() ( ParticleType& particle ) const throw() {
+					particle.velocity += particle.acceleration *
+										 vec3( gfx::time::DeltaTimef() );		
+				}	
+			
 	}			// End namespace part
 }				// End namespace gfx
 

@@ -25,6 +25,7 @@
 #include "../Texture/Textures.hpp"
 #include "../Render/BuildList.hpp"		// For creating build lists
 #include "../Shape/Shape.hpp"			// For Shape class
+#include "../Time/Time.hpp"
 
 using namespace gfx::tex;				// For Textures class
 using namespace gfx::shape;				// For Shape and ShapeHash
@@ -56,7 +57,10 @@ namespace gfx {
 				 *				  no particles to be active. 
 				 * ===========================================================
 				 */
-				explicit gfxParticles() throw() : activeCount(0) {}
+				explicit gfxParticles() throw() : activeCount(0) {
+					// Make sure that the time change will be correct
+					gfx::time::ResetDeltaTime();
+				}
 
 				/*
 				 * ===========================================================
