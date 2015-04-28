@@ -43,7 +43,7 @@ namespace gfx {
 								   gfxTextureInitializer<gfxParticle>		,	// Texture initializer
 								   gfxVelocityInitializer<gfxParticle>		,	// Velocity initializer
 								   gfxNullPolicy<gfxParticle>				,	// Movement initializer
-								   gfxAccelerationInitializer<gfxParticle>	>
+								   gfxAccelerationInitializer<gfxParticle>	>   // Acceleration initializer
 								ParticleInitializer;
 
 	
@@ -60,9 +60,9 @@ namespace gfx {
 								   gfxNullPolicy<gfxParticle>			,	// Color action
 								   gfxNullPolicy<gfxParticle>			,	// Shape action
 								   gfxNullPolicy<gfxParticle>			,	// Texture action
-								   gfxNullPolicy<gfxParticle>			,	// Velocity action
+								   gfxVelocityAction<gfxParticle>		,	// Velocity action
 								   gfxMoveAction<gfxParticle>			,   // Movement action
-								   gfxAccelerationAction<gfxParticle>	>
+								   gfxNullPolicy<gfxParticle>			>	// Acceleration action
 								ParticleAction;	
 	}	// End namespace part
 }		// End namepsace gfx

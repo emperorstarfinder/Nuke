@@ -175,6 +175,7 @@ namespace gfx {
 							++count;
 						}
 					}
+					gfx::time::ResetDeltaTime();								// Iteration ended, restart time
 				}
 
 				/*

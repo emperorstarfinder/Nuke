@@ -94,14 +94,11 @@ namespace gfx {
 		 * Function			: DeltaTime 
 		 *
 		 * Description		: Returns the number of nanoseconds since
-		 *					  the last call to ( DeltaTime | 
-		 *					  DeltaTimef ).
+		 *					  the last call to ResetTime.
 		 * ================================================================
 		 */
 		inline ullong DeltaTime() throw() {
-			ullong iterTime = duration_cast<nanoseconds>( Clock::now() - prevTime ).count();
-			prevTime = Clock::now();		// Next iter prev time is this time
-			return iterTime;
+			return duration_cast<nanoseconds>( Clock::now() - prevTime ).count();
 		}
 
 		/* 
@@ -113,10 +110,8 @@ namespace gfx {
 		 * ================================================================
 		 */
 		inline float DeltaTimef() throw() {
-			float iterTime = static_cast<float>( duration_cast<nanoseconds> (
+			return static_cast<float>( duration_cast<nanoseconds> (
 						Clock::now() - prevTime ).count() ) / 1000000000.f;
-			prevTime = Clock::now();
-			return iterTime;
 			}
 	}			// End namespace time
 }				// End namespace gfx

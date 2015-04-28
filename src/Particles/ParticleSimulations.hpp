@@ -86,7 +86,7 @@ namespace gfx {
 				particles.initializerPolicy.colorPolicy.SetColor( vec4( colR, colG, colB, 1.0f ) );		// Set the color
 
 				// Emit the particle at the x,y origin but into the screen
-				particles.Emit( 1, vec3( 0.f, 0.f, -22.f ) ); 
+				particles.Emit( 1, vec3( 0.f, 0.f, -17.f ) ); 
 			}
 
 			// Load a texture for the particles 

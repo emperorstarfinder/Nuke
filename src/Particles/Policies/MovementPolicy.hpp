@@ -23,6 +23,7 @@
 
 #include <glm/vec3.hpp>
 #include "../../Time/Time.hpp"
+#include <stdio.h>
 
 using namespace std;
 using namespace glm;
@@ -63,7 +64,7 @@ namespace gfx {
 				 */
 				inline void operator() ( ParticleType& particle ) const throw() {
 					particle.pos += particle.velocity *
-									vec3( gfx::time::DeltaTimef() );		
+									vec3( 60.f * gfx::time::DeltaTimef() );	
 				}
 		};	
 	}			// End namespace part

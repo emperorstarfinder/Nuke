@@ -119,9 +119,9 @@ namespace gfx {
 				 */
 				inline void operator() ( ParticleType& particle ) const throw() {
 					particle.velocity += particle.acceleration *
-										 vec3( gfx::time::DeltaTimef() );		
-				}	
-			
+										 vec3( 0.001f * gfx::time::DeltaTimef() );		
+				}
+		};		
 	}			// End namespace part
 }				// End namespace gfx
 

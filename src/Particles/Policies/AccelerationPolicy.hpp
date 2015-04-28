@@ -78,7 +78,7 @@ namespace gfx {
 				 *								  acceleration for.
 				 * =============================================================
 				 */
-				inline void operator() ( const ParticleType& particle ) const throw() {
+				inline void operator() ( ParticleType& particle ) const throw() {
 					particle.acceleration = acceleration;
 				}
 		};

@@ -96,7 +96,7 @@ namespace gfx {
 					texturePolicy( particle );			// Give the particle a texture to use
 					velocityPolicy( particle );			// Perform velocity related actions
 					movementPolicy( particle );			// Move the particle
-					acclerationPolicy( particle );		// Update the acceleration
+					accelerationPolicy( particle );		// Update the acceleration
 				}
 		};		
 	}			// End namespace gfx
