@@ -36,39 +36,32 @@ namespace gfx {
 		 * ==================================================================
 		 * Function		: BustSimulationSetup
 		 *
-		 * Description	: Sets up a group of particles to burst outwards from
-		 *				  the origin with each particle having a different 
-		 *				  color and velocity.
+		 * Description	: Sets up a group of particles in a ring when looking
+		 *                from the +y axis. The particles then burst upwards 
+		 *                before being pulled down by gravity.
 		 * ==================================================================
 		 */
 		template <class ParticleType>		
 		void BurstSimulationSetup( ParticleType& particles ) {
 
-			// Temp variables for color and velocity
-			float velX = 0.001f, velY = 0.0f, velZ = 0.031f;
+			// Temp variables for color and position
+			float posX = 0.0f, posY = 0.0f, posZ = 0.0f;
 			float colR = 0.01f, colG = 0.01f, colB = 0.01f;
-			float theta, mag = 0.03f;;
+			float theta, velY, radius = 3.5f;;
 
 			// Total number of particles in system
 			size_t numParticles = particles.MaxParticles();
 
 			// initialize the size of the particles
-			particles.initializerPolicy.shapePolicy.SetSize( vec3(0.3f, 0.3f, 0.3f) );
+			particles.initializerPolicy.shapePolicy.SetSize( vec3(0.04f, 0.04f, 0.04f) );
 
 			for ( size_t i = 0; i < numParticles; i++ ) {
 				// Determine the angle of the particle
-				theta = 2 * 3.1415f / numParticles * i;
+				theta = 8 * 3.1415f / numParticles * i;
 
-				// Get X and y using theta
-				velX = mag * cos( theta );
-				velY = sqrt( ( mag * mag ) - ( velX * velX ) );
-
-				// Swap velocites for second half of array
-				if ( i > (numParticles / 2 ) ) {
-					velX *= -1.f;
-					velY *= -1.f;
-					velZ *= -1.f;
-				}	
+				// Get X and Z using theta
+				posX = radius * cos( theta );
+				posZ = -12.f + radius * sin( theta );
 
 				// Determine colors
 				if		( i <  ( numParticles / 3 ) )        {
@@ -82,11 +75,14 @@ namespace gfx {
 					colB += ( 1.f / ( numParticles / 3 ) );
 				}
 
-				particles.initializerPolicy.velocityPolicy.SetVelocity( vec3( velX, velY, velZ ) );		// Set particle velocity
+				// Velocity in y direction
+				velY = 0.02f  + 0.04f * (float)i / (float)numParticles;
+
+				particles.initializerPolicy.velocityPolicy.SetVelocity( vec3( 0.f, velY, 0.f ) );		// Set particle velocity
 				particles.initializerPolicy.colorPolicy.SetColor( vec4( colR, colG, colB, 1.0f ) );		// Set the color
 
 				// Emit the particle at the x,y origin but into the screen
-				particles.Emit( 1, vec3( 0.f, 0.f, -17.f ) ); 
+				particles.Emit( 1, vec3( posX, -3.f, posZ ) ); 
 			}
 
 			// Load a texture for the particles 

@@ -25,7 +25,7 @@ vec3 cubeSize(2.0f, 2.0f, 2.0f);
 #define LEFT_ARROW	75			
 #define RIGHT_ARROW	77			
 
-const int NUM_PARTICLES = 100;
+const int NUM_PARTICLES = 10000;
 
 int window;				    // Number of the GLUT window
 int light;					// Lighting (1 = ON, 0 = OFF)
