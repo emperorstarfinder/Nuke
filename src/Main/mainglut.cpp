@@ -32,45 +32,23 @@ int light;					// Lighting (1 = ON, 0 = OFF)
 int lp;						// If 'L' is pressed
 int fp;						// If 'F' is pressed
 
-GLfloat rotX, rotY, rotZ;			// Angles and speeds of rotation
+GLfloat rotX = 0.0f, rotY = 0.0f, rotZ;			// Angles and speeds of rotation
 GLfloat z = -5.0f;					// Depth into the screen
 gfxTextures textureArray;
 GLuint blend;						// Turn the blending on or off
 
-GLuint cube = 1000;						// Storage for the display list
+GLuint cube, plane;					// Storage for the display list
 GLuint top;							// Storage for the second display list
 GLuint xloop;						// Loop for the x axis
 GLuint yloop;						// Loop for the y axis 
 
-// Define the particles to use for the visual test
-// Initially the particles will be drawn without a texture
 gfxParticles<NUM_PARTICLES, gfxParticle, ParticleInitializer, ParticleAction> particles;
-
-void particleConfig()
-{
-	particles.initializerPolicy.velocityPolicy.SetVelocity( vec3(0.002f, 0.003f, 0.f ) );	// Set their velocity
-	particles.initializerPolicy.shapePolicy.SetSize( vec3( 0.5f, 0.5f, 0.5f ) );		    // Set their size
-	particles.initializerPolicy.colorPolicy.SetColor( vec4( 0.5f, 1.0f, 1.0f, 1.0f ) );		// Set the color
-
-	// Emit 1 particle at the origin
-	particles.Emit( 1, vec3( 0.f, 0.f, -6.f ) ); 
-
-	particles.initializerPolicy.velocityPolicy.SetVelocity (vec3( -0.002f, -0.003f, -0.1f ) );
-	particles.initializerPolicy.shapePolicy.SetSize( vec3( 0.5f, 0.5f, 0.5f ) );		    // Set their size
-	particles.initializerPolicy.colorPolicy.SetColor( vec4( 0.0f, 1.0f, 0.0f, 0.2f ) );		// Set the color
-	particles.Emit( 1, vec3( -0.3, 0.f, -4.f ) );
-
-	// Load a texture for the particles (REQUIRED)
-	particles.AddTextures( {"textures/Cube.bmp"} );
-
-	// Build the shapes for the particles
-	particles.BuildShapes();
-}
 
 // General OpenGL init. Sets all initial params
 void initGL(int width, int height)
 {
 	BurstSimulationSetup(particles);
+	BuildList( gfx::shape::DrawableShapes::PLANE, vec3(10.f, 0.0f, 10.f), &plane );
 	glEnable( GL_TEXTURE_2D );					// Enable texture mapping
 	glClearColor( 0.0f, 0.0f, 0.0f, 0.0f );		// Black background
 	glClearDepth( 1.0 );						// Allows depth buffer to be cleared
@@ -120,6 +98,12 @@ void drawGlScene()
 
 	// Update the particle attributes
 	particles.Update();
+
+	glLoadIdentity();
+	glTranslatef(0.0f, -2.5f, -10.f);
+	glRotatef(30.f, 0.0f, 1.0f, 0.0f);
+	glColor4f( 0.0f, 0.73f, 0.7f, 1.0f);
+	glCallList( plane );
 	
 	// Double buffered so swap the buffers 
 	// to display what was just drawn

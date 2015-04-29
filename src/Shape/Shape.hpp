@@ -39,8 +39,9 @@ namespace gfx {
 		 * ==================================================================
 		*/
 		enum DrawableShapes {
-			NONE = 0,
-			CUBE = 1
+			NONE  = 0,
+			CUBE  = 1,
+			PLANE = 2
 		};
 
 		/*

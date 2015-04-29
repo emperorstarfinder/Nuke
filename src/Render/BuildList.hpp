@@ -108,22 +108,58 @@ namespace gfx {
 		}
 
 		/*
-		 * =====================================================================================================
+		 * ====================================================================================
+		 * Funcrion			: PlaneList 
+		 *
+		 * Description		: Function to draw a plane of a specific size, with
+		 *					  a normal through the z axis. The plane can then be rotated
+		 *					  dynamically.
+		 * 
+		 * Params			: _size			: The size of the plane in each
+		 *									  dimension.
+		 *					: listPointer	: A pointer to the list handle.
+		 * ====================================================================================
+		 */
+		GLvoid PlaneList( const vec3& _size, GLuint* listPointer )
+		{
+			*listPointer = glGenLists(1);			// Only need one list for a cube
+			glNewList(*listPointer, GL_COMPILE);	// Store the list at listPointers location & compile
+
+			glBegin(GL_QUADS);
+
+			glTexCoord2f(0.0f, 1.0f); 
+			glVertex3f(-0.5f * _size.x, 0.0f, -0.5f * _size.z);		// Back Left Of The Texture and Plane
+			glTexCoord2f(0.0f, 0.0f); 
+			glVertex3f(-0.5f * _size.x, 0.0f,  0.5f * _size.z);		// Front Left Of The Texture and Quad		
+			glTexCoord2f(1.0f, 0.0f); 
+			glVertex3f( 0.5f * _size.x, 0.0f,  0.5f * _size.z);		// Front Right Of The Texture and Quad
+			glTexCoord2f(1.0f, 1.0f); 
+			glVertex3f( 0.5f * _size.x, 0.0f, -0.5f * _size.z);		// Back Right Of The Texture and Quad
+
+			glEnd();
+			glEndList();
+		}
+
+		/*
+		 * ====================================================================================
 		 * Function			: BuildList 
 		 *
 		 * Description		: Builds a list for the given shape.
 		 *
 		 * Params			: shape			: The shape that the list should build.
 		 *					: listPointer	: A pointer to the GLuint handle for the built list.
-		 * ====================================================================================================
+		 * ====================================================================================
 		 */
-		GLvoid BuildList(DrawableShapes shape, const vec3& size, GLuint* listpointer)
+		GLvoid BuildList(DrawableShapes shape, const vec3& size, GLuint* listPointer)
 		{
 			// Check which build list function must be called
 			switch (shape) {
 				case CUBE:
-					CubeList(size, listpointer);
+					CubeList(size, listPointer);
 					break;
+
+				case PLANE:
+					PlaneList(size, listPointer);
 
 				default:
 					break;
